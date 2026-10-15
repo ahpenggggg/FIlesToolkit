@@ -1,0 +1,8 @@
+expo.modules.filetoolkit.duplicates.filetoolkit-duplicates-pngs-0 /Users/kpboon/Personal Project/FIlesToolkit/modules/duplicates/android/build/generated/res/pngs/release
+expo.modules.filetoolkit.duplicates.filetoolkit-duplicates-resValues-1 /Users/kpboon/Personal Project/FIlesToolkit/modules/duplicates/android/build/generated/res/resValues/release
+expo.modules.filetoolkit.duplicates.filetoolkit-duplicates-mergeReleaseResources-2 /Users/kpboon/Personal Project/FIlesToolkit/modules/duplicates/android/build/intermediates/incremental/release/mergeReleaseResources/merged.dir
+expo.modules.filetoolkit.duplicates.filetoolkit-duplicates-mergeReleaseResources-3 /Users/kpboon/Personal Project/FIlesToolkit/modules/duplicates/android/build/intermediates/incremental/release/mergeReleaseResources/stripped.dir
+expo.modules.filetoolkit.duplicates.filetoolkit-duplicates-release-4 /Users/kpboon/Personal Project/FIlesToolkit/modules/duplicates/android/build/intermediates/merged_res/release/mergeReleaseResources
+expo.modules.filetoolkit.duplicates.filetoolkit-duplicates-main-5 /Users/kpboon/Personal Project/FIlesToolkit/modules/duplicates/android/src/main/res
+expo.modules.filetoolkit.duplicates.filetoolkit-duplicates-release-6 /Users/kpboon/Personal Project/FIlesToolkit/modules/duplicates/android/src/release/res
+expo.modules.filetoolkit.duplicates.filetoolkit-duplicates-release-7 /Users/kpboon/Personal Project/FIlesToolkit/modules/media-library/android/build/intermediates/packaged_res/release/packageReleaseResources

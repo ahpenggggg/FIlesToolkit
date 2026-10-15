@@ -1,0 +1,10 @@
+{
+  "name": "filetoolkit-compress",
+  "version": "1.0.0",
+  "description": "FileToolkit Compress video: HEVC re-encoding with a quality check",
+  "main": "index.ts",
+  "types": "index.ts",
+  "license": "MIT",
+  "author": "JP",
+  "homepage": "https://github.com/ahpenggggg"
+}

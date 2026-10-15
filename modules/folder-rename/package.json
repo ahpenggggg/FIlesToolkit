@@ -1,0 +1,10 @@
+{
+  "name": "filetoolkit-folder-rename",
+  "version": "1.0.0",
+  "description": "FileToolkit Folder rename: names child folders by their video and photo count",
+  "main": "index.ts",
+  "types": "index.ts",
+  "license": "MIT",
+  "author": "JP",
+  "homepage": "https://github.com/ahpenggggg"
+}

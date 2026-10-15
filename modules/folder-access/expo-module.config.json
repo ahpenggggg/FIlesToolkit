@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android"],
+  "apple": {
+    "modules": ["FTFolderAccessModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.filetoolkit.folderaccess.FolderAccessModule"]
+  }
+}

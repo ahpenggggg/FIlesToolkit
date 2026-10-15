@@ -1,0 +1,10 @@
+{
+  "name": "filetoolkit-folder-picker",
+  "version": "1.0.0",
+  "description": "FileToolkit shared folder choosing: the Folders card and the Choose folders sheet, fed by any folder source",
+  "main": "index.ts",
+  "types": "index.ts",
+  "license": "MIT",
+  "author": "JP",
+  "homepage": "https://github.com/ahpenggggg"
+}

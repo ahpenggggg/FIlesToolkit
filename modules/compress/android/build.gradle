@@ -1,0 +1,28 @@
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+
+group = 'expo.modules.filetoolkit.compress'
+version = '1.0.0'
+
+android {
+  namespace "expo.modules.filetoolkit.compress"
+  defaultConfig {
+    versionCode 1
+    versionName "1.0.0"
+  }
+  lint {
+    // Media3 Transformer APIs are @UnstableApi; don't let lint block release builds.
+    abortOnError false
+    checkReleaseBuilds false
+  }
+}
+
+dependencies {
+  implementation project(':filetoolkit-media-library')
+  implementation "androidx.media3:media3-transformer:1.5.1"
+  implementation "androidx.media3:media3-effect:1.5.1"
+  implementation "androidx.media3:media3-common:1.5.1"
+  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0"
+}

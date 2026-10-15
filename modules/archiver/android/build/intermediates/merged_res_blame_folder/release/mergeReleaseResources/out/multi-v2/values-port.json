@@ -1,0 +1,34 @@
+{
+    "logs": [
+        {
+            "outputFile": "expo.modules.filetoolkit.archiver.filetoolkit-archiver-release-22:/values-port/values-port.xml",
+            "map": [
+                {
+                    "source": "/Users/kpboon/.gradle/caches/9.3.1/transforms/ad24be622b75686ae399b52aadfb3c1d/transformed/appcompat-1.7.1/res/values-port/values-port.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "55",
+                        "endOffsets": "106"
+                    }
+                }
+            ]
+        },
+        {
+            "outputFile": "expo.modules.filetoolkit.archiver.filetoolkit-archiver-mergeReleaseResources-20:/values-port/values-port.xml",
+            "map": [
+                {
+                    "source": "/Users/kpboon/.gradle/caches/9.3.1/transforms/ad24be622b75686ae399b52aadfb3c1d/transformed/appcompat-1.7.1/res/values-port/values-port.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "55",
+                        "endOffsets": "106"
+                    }
+                }
+            ]
+        }
+    ]
+}

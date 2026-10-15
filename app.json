@@ -1,0 +1,68 @@
+{
+  "expo": {
+    "name": "FileToolkit",
+    "slug": "filetoolkit",
+    "scheme": "filetoolkit",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "bundleIdentifier": "com.filetoolkit.app",
+      "supportsTablet": true,
+      "deploymentTarget": "16.4",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "FileToolkit scans your photos and videos on-device to find duplicates and compress large videos.",
+        "NSPhotoLibraryAddUsageDescription": "FileToolkit saves compressed videos back to your library."
+      },
+      "buildNumber": "1"
+    },
+    "android": {
+      "package": "com.filetoolkit.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#EEF1F4",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "permissions": [
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO",
+        "android.permission.READ_MEDIA_VISUAL_USER_SELECTED",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.MANAGE_EXTERNAL_STORAGE"
+      ],
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "predictiveBackGestureEnabled": false,
+      "versionCode": 1
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "minSdkVersion": 30,
+            "extraMavenRepos": [
+              "https://www.jitpack.io"
+            ]
+          }
+        }
+      ],
+      "./plugins/withReleaseSigning",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 140,
+          "backgroundColor": "#EEF1F4",
+          "dark": {
+            "image": "./assets/splash-icon-dark.png",
+            "backgroundColor": "#0F2236"
+          }
+        }
+      ]
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "filetoolkit-folder-access",
+  "version": "1.0.0",
+  "description": "FileToolkit shared folder access: pick a folder, list it and rename its items safely",
+  "main": "index.ts",
+  "types": "index.ts",
+  "license": "MIT",
+  "author": "JP",
+  "homepage": "https://github.com/ahpenggggg"
+}

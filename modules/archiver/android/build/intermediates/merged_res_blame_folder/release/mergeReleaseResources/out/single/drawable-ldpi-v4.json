@@ -1,0 +1,26 @@
+[
+    {
+        "merged": "expo.modules.filetoolkit.archiver.filetoolkit-archiver-release-22:/drawable-ldpi-v4/ic_call_decline_low.png",
+        "source": "expo.modules.filetoolkit.archiver.filetoolkit-archiver-core-1.13.0-6:/drawable-ldpi-v4/ic_call_decline_low.png"
+    },
+    {
+        "merged": "expo.modules.filetoolkit.archiver.filetoolkit-archiver-release-22:/drawable-ldpi-v4/ic_call_answer_video_low.png",
+        "source": "expo.modules.filetoolkit.archiver.filetoolkit-archiver-core-1.13.0-6:/drawable-ldpi-v4/ic_call_answer_video_low.png"
+    },
+    {
+        "merged": "expo.modules.filetoolkit.archiver.filetoolkit-archiver-release-22:/drawable-ldpi-v4/ic_call_answer.png",
+        "source": "expo.modules.filetoolkit.archiver.filetoolkit-archiver-core-1.13.0-6:/drawable-ldpi-v4/ic_call_answer.png"
+    },
+    {
+        "merged": "expo.modules.filetoolkit.archiver.filetoolkit-archiver-release-22:/drawable-ldpi-v4/ic_call_answer_low.png",
+        "source": "expo.modules.filetoolkit.archiver.filetoolkit-archiver-core-1.13.0-6:/drawable-ldpi-v4/ic_call_answer_low.png"
+    },
+    {
+        "merged": "expo.modules.filetoolkit.archiver.filetoolkit-archiver-release-22:/drawable-ldpi-v4/ic_call_decline.png",
+        "source": "expo.modules.filetoolkit.archiver.filetoolkit-archiver-core-1.13.0-6:/drawable-ldpi-v4/ic_call_decline.png"
+    },
+    {
+        "merged": "expo.modules.filetoolkit.archiver.filetoolkit-archiver-release-22:/drawable-ldpi-v4/ic_call_answer_video.png",
+        "source": "expo.modules.filetoolkit.archiver.filetoolkit-archiver-core-1.13.0-6:/drawable-ldpi-v4/ic_call_answer_video.png"
+    }
+]

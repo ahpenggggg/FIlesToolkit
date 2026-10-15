@@ -1,0 +1,12 @@
+expo.modules.filetoolkit.compress.filetoolkit-compress-annotation-experimental-1.3.1-0 /Users/kpboon/.gradle/caches/9.3.1/transforms/00b06bc8556b395163317f49f2ac1b33/transformed/annotation-experimental-1.3.1/res
+expo.modules.filetoolkit.compress.filetoolkit-compress-lifecycle-runtime-2.3.1-1 /Users/kpboon/.gradle/caches/9.3.1/transforms/0c089da1aacd2f866687ee49b7e7bd98/transformed/lifecycle-runtime-2.3.1/res
+expo.modules.filetoolkit.compress.filetoolkit-compress-media3-exoplayer-1.5.1-2 /Users/kpboon/.gradle/caches/9.3.1/transforms/15737a71a2ed3617cace6538d850cb11/transformed/media3-exoplayer-1.5.1/res
+expo.modules.filetoolkit.compress.filetoolkit-compress-core-1.8.0-3 /Users/kpboon/.gradle/caches/9.3.1/transforms/1d0d7cbad84f817394c576d4c8d170cc/transformed/core-1.8.0/res
+expo.modules.filetoolkit.compress.filetoolkit-compress-pngs-4 /Users/kpboon/Personal Project/FIlesToolkit/modules/compress/android/build/generated/res/pngs/release
+expo.modules.filetoolkit.compress.filetoolkit-compress-resValues-5 /Users/kpboon/Personal Project/FIlesToolkit/modules/compress/android/build/generated/res/resValues/release
+expo.modules.filetoolkit.compress.filetoolkit-compress-mergeReleaseResources-6 /Users/kpboon/Personal Project/FIlesToolkit/modules/compress/android/build/intermediates/incremental/release/mergeReleaseResources/merged.dir
+expo.modules.filetoolkit.compress.filetoolkit-compress-mergeReleaseResources-7 /Users/kpboon/Personal Project/FIlesToolkit/modules/compress/android/build/intermediates/incremental/release/mergeReleaseResources/stripped.dir
+expo.modules.filetoolkit.compress.filetoolkit-compress-release-8 /Users/kpboon/Personal Project/FIlesToolkit/modules/compress/android/build/intermediates/merged_res/release/mergeReleaseResources
+expo.modules.filetoolkit.compress.filetoolkit-compress-main-9 /Users/kpboon/Personal Project/FIlesToolkit/modules/compress/android/src/main/res
+expo.modules.filetoolkit.compress.filetoolkit-compress-release-10 /Users/kpboon/Personal Project/FIlesToolkit/modules/compress/android/src/release/res
+expo.modules.filetoolkit.compress.filetoolkit-compress-release-11 /Users/kpboon/Personal Project/FIlesToolkit/modules/media-library/android/build/intermediates/packaged_res/release/packageReleaseResources

@@ -1,0 +1,45 @@
+{
+  "name": "filetoolkit",
+  "version": "1.0.0",
+  "main": "expo-router/entry",
+  "dependencies": {
+    "@expo/vector-icons": "^15.0.2",
+    "@react-native-async-storage/async-storage": "^2.2.0",
+    "@react-native-community/slider": "^5.2.0",
+    "@shopify/flash-list": "2.0.2",
+    "expo": "~57.0.27",
+    "expo-build-properties": "~57.0.22",
+    "expo-constants": "~57.0.21",
+    "expo-dev-client": "~57.0.19",
+    "expo-image": "~57.0.5",
+    "expo-keep-awake": "~57.0.2",
+    "expo-linking": "~57.0.12",
+    "expo-router": "~57.0.25",
+    "expo-splash-screen": "~57.0.9",
+    "expo-status-bar": "~57.0.1",
+    "expo-system-ui": "~57.0.4",
+    "react": "19.2.3",
+    "react-dom": "^19.2.3",
+    "react-native": "0.86.3",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "~4.26.0"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.2",
+    "eslint": "^9.39.5",
+    "eslint-config-expo": "~57.0.2",
+    "typescript": "~6.0.3"
+  },
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "apk": "expo prebuild -p android --no-install && cd android && ./gradlew assembleRelease && mkdir -p ../dist && cp app/build/outputs/apk/release/app-release.apk ../dist/FileToolkit-release.apk",
+    "aab": "expo prebuild -p android --no-install && cd android && ./gradlew bundleRelease",
+    "install:apk": "adb install -r android/app/build/outputs/apk/release/app-release.apk",
+    "test": "node --test --experimental-strip-types --no-warnings modules/file-rename/grouping.test.ts modules/file-rename/model.test.ts modules/folder-rename/naming.test.ts modules/folder-access/names.test.ts modules/archiver/naming.test.ts"
+  },
+  "private": true
+}

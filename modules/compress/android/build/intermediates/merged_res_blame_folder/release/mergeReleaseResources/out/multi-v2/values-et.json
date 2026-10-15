@@ -1,0 +1,68 @@
+{
+    "logs": [
+        {
+            "outputFile": "expo.modules.filetoolkit.compress.filetoolkit-compress-mergeReleaseResources-5:/values-et/values-et.xml",
+            "map": [
+                {
+                    "source": "/Users/kpboon/.gradle/caches/9.3.1/transforms/1d0d7cbad84f817394c576d4c8d170cc/transformed/core-1.8.0/res/values-et/values-et.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "100",
+                        "endOffsets": "151"
+                    },
+                    "to": {
+                        "startLines": "11",
+                        "startColumns": "4",
+                        "startOffsets": "749",
+                        "endColumns": "100",
+                        "endOffsets": "845"
+                    }
+                },
+                {
+                    "source": "/Users/kpboon/.gradle/caches/9.3.1/transforms/15737a71a2ed3617cace6538d850cb11/transformed/media3-exoplayer-1.5.1/res/values-et/values-et.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9,10",
+                        "startColumns": "4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,129,196,263,337,419,490,580,672",
+                        "endColumns": "73,66,66,73,81,70,89,91,76",
+                        "endOffsets": "124,191,258,332,414,485,575,667,744"
+                    }
+                }
+            ]
+        },
+        {
+            "outputFile": "expo.modules.filetoolkit.compress.filetoolkit-compress-release-7:/values-et/values-et.xml",
+            "map": [
+                {
+                    "source": "/Users/kpboon/.gradle/caches/9.3.1/transforms/1d0d7cbad84f817394c576d4c8d170cc/transformed/core-1.8.0/res/values-et/values-et.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "100",
+                        "endOffsets": "151"
+                    },
+                    "to": {
+                        "startLines": "11",
+                        "startColumns": "4",
+                        "startOffsets": "749",
+                        "endColumns": "100",
+                        "endOffsets": "845"
+                    }
+                },
+                {
+                    "source": "/Users/kpboon/.gradle/caches/9.3.1/transforms/15737a71a2ed3617cace6538d850cb11/transformed/media3-exoplayer-1.5.1/res/values-et/values-et.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9,10",
+                        "startColumns": "4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,129,196,263,337,419,490,580,672",
+                        "endColumns": "73,66,66,73,81,70,89,91,76",
+                        "endOffsets": "124,191,258,332,414,485,575,667,744"
+                    }
+                }
+            ]
+        }
+    ]
+}

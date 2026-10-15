@@ -1,0 +1,10 @@
+{
+  "name": "filetoolkit-archiver",
+  "version": "1.0.0",
+  "description": "FileToolkit Archives: create ZIPs (password, split parts) and extract ZIP, RAR and 7Z",
+  "main": "index.ts",
+  "types": "index.ts",
+  "license": "MIT",
+  "author": "JP",
+  "homepage": "https://github.com/ahpenggggg"
+}

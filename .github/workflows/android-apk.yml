@@ -1,0 +1,50 @@
+# Free cloud APK build on GitHub Actions (no EAS).
+# Optional signing: add repo secrets
+#   KEYSTORE_BASE64   (base64 -i filetoolkit.jks | pbcopy)
+#   STORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD
+# Without them the APK is signed with the debug key (fine for sideloading).
+name: Android APK
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+      - run: npm ci
+      - run: npx expo prebuild -p android --no-install
+      - name: Signing key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+            mkdir -p ~/.gradle
+            {
+              echo "FILETOOLKIT_STORE_FILE=$RUNNER_TEMP/release.jks"
+              echo "FILETOOLKIT_STORE_PASSWORD=$STORE_PASSWORD"
+              echo "FILETOOLKIT_KEY_ALIAS=$KEY_ALIAS"
+              echo "FILETOOLKIT_KEY_PASSWORD=$KEY_PASSWORD"
+            } >> ~/.gradle/gradle.properties
+          fi
+      - run: ./gradlew assembleRelease
+        working-directory: android
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FileToolkit-apk
+          path: android/app/build/outputs/apk/release/*.apk

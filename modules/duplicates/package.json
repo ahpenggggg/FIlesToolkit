@@ -1,0 +1,10 @@
+{
+  "name": "filetoolkit-duplicates",
+  "version": "1.0.0",
+  "description": "FileToolkit Duplicates: finds similar photos and videos",
+  "main": "index.ts",
+  "types": "index.ts",
+  "license": "MIT",
+  "author": "JP",
+  "homepage": "https://github.com/ahpenggggg"
+}

@@ -1,0 +1,27 @@
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-profileinstaller-1.3.1-0 /Users/kpboon/.gradle/caches/9.3.1/transforms/0a2cd0d2c10ae8d6e61e45e311b4eabf/transformed/profileinstaller-1.3.1/res
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-lifecycle-livedata-core-2.6.2-1 /Users/kpboon/.gradle/caches/9.3.1/transforms/109b7a3ea03657010d1b0a64d2094bc4/transformed/lifecycle-livedata-core-2.6.2/res
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-lifecycle-viewmodel-2.6.2-2 /Users/kpboon/.gradle/caches/9.3.1/transforms/14374a9ad3111d068cd5204c1a285d7a/transformed/lifecycle-viewmodel-2.6.2/res
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-startup-runtime-1.1.1-3 /Users/kpboon/.gradle/caches/9.3.1/transforms/2765446cc641e15ae278c5aae08919a1/transformed/startup-runtime-1.1.1/res
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-core-runtime-2.2.0-4 /Users/kpboon/.gradle/caches/9.3.1/transforms/2c98b3ab0575eb4836ce0ae512e09609/transformed/core-runtime-2.2.0/res
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-lifecycle-viewmodel-savedstate-2.6.2-5 /Users/kpboon/.gradle/caches/9.3.1/transforms/311ad7d633c82b4b1d8865b0303089d2/transformed/lifecycle-viewmodel-savedstate-2.6.2/res
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-core-1.13.0-6 /Users/kpboon/.gradle/caches/9.3.1/transforms/3d3beef35d3564ffd3e90af29befcb5c/transformed/core-1.13.0/res
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-appcompat-resources-1.7.1-7 /Users/kpboon/.gradle/caches/9.3.1/transforms/72a7ab7db78bfcf78c6f40e0daa7eb4f/transformed/appcompat-resources-1.7.1/res
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-emoji2-1.3.0-8 /Users/kpboon/.gradle/caches/9.3.1/transforms/8ed555bf2cf48a5d35e0ee7f39f62086/transformed/emoji2-1.3.0/res
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-emoji2-views-helper-1.3.0-9 /Users/kpboon/.gradle/caches/9.3.1/transforms/9555746bc2970fb92ca27469fae5b9af/transformed/emoji2-views-helper-1.3.0/res
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-activity-1.8.0-10 /Users/kpboon/.gradle/caches/9.3.1/transforms/9efe6d2b0edbed98af1ff18fc7c277ce/transformed/activity-1.8.0/res
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-lifecycle-process-2.6.2-11 /Users/kpboon/.gradle/caches/9.3.1/transforms/a73aa61a54a1407a85420c9c5961c96d/transformed/lifecycle-process-2.6.2/res
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-fragment-1.5.4-12 /Users/kpboon/.gradle/caches/9.3.1/transforms/ad23188c1dd2072d46066dd7ccf0c3a5/transformed/fragment-1.5.4/res
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-appcompat-1.7.1-13 /Users/kpboon/.gradle/caches/9.3.1/transforms/ad24be622b75686ae399b52aadfb3c1d/transformed/appcompat-1.7.1/res
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-core-ktx-1.13.0-14 /Users/kpboon/.gradle/caches/9.3.1/transforms/b20612476b7e0eee6e675a5940e0fd70/transformed/core-ktx-1.13.0/res
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-savedstate-1.2.1-15 /Users/kpboon/.gradle/caches/9.3.1/transforms/c448ef77c5be917c57f7791e539994b7/transformed/savedstate-1.2.1/res
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-lifecycle-livedata-2.6.2-16 /Users/kpboon/.gradle/caches/9.3.1/transforms/d93eebd16650e1b94354b7f42759244f/transformed/lifecycle-livedata-2.6.2/res
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-lifecycle-runtime-2.6.2-17 /Users/kpboon/.gradle/caches/9.3.1/transforms/ec3ff502ff541c7fa7c95a04cdbbb865/transformed/lifecycle-runtime-2.6.2/res
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-annotation-experimental-1.4.0-18 /Users/kpboon/.gradle/caches/9.3.1/transforms/fb6e8f3273f20f17bd820e46d05209f5/transformed/annotation-experimental-1.4.0/res
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-pngs-19 /Users/kpboon/Personal Project/FIlesToolkit/modules/archiver/android/build/generated/res/pngs/release
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-resValues-20 /Users/kpboon/Personal Project/FIlesToolkit/modules/archiver/android/build/generated/res/resValues/release
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-mergeReleaseResources-21 /Users/kpboon/Personal Project/FIlesToolkit/modules/archiver/android/build/intermediates/incremental/release/mergeReleaseResources/merged.dir
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-mergeReleaseResources-22 /Users/kpboon/Personal Project/FIlesToolkit/modules/archiver/android/build/intermediates/incremental/release/mergeReleaseResources/stripped.dir
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-release-23 /Users/kpboon/Personal Project/FIlesToolkit/modules/archiver/android/build/intermediates/merged_res/release/mergeReleaseResources
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-main-24 /Users/kpboon/Personal Project/FIlesToolkit/modules/archiver/android/src/main/res
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-release-25 /Users/kpboon/Personal Project/FIlesToolkit/modules/archiver/android/src/release/res
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-release-26 /Users/kpboon/Personal Project/FIlesToolkit/modules/folder-access/android/build/intermediates/packaged_res/release/packageReleaseResources

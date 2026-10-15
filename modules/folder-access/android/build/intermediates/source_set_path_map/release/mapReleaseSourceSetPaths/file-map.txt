@@ -1,0 +1,7 @@
+expo.modules.filetoolkit.folderaccess.filetoolkit-folder-access-pngs-0 /Users/kpboon/Personal Project/FIlesToolkit/modules/folder-access/android/build/generated/res/pngs/release
+expo.modules.filetoolkit.folderaccess.filetoolkit-folder-access-resValues-1 /Users/kpboon/Personal Project/FIlesToolkit/modules/folder-access/android/build/generated/res/resValues/release
+expo.modules.filetoolkit.folderaccess.filetoolkit-folder-access-mergeReleaseResources-2 /Users/kpboon/Personal Project/FIlesToolkit/modules/folder-access/android/build/intermediates/incremental/release/mergeReleaseResources/merged.dir
+expo.modules.filetoolkit.folderaccess.filetoolkit-folder-access-mergeReleaseResources-3 /Users/kpboon/Personal Project/FIlesToolkit/modules/folder-access/android/build/intermediates/incremental/release/mergeReleaseResources/stripped.dir
+expo.modules.filetoolkit.folderaccess.filetoolkit-folder-access-release-4 /Users/kpboon/Personal Project/FIlesToolkit/modules/folder-access/android/build/intermediates/merged_res/release/mergeReleaseResources
+expo.modules.filetoolkit.folderaccess.filetoolkit-folder-access-main-5 /Users/kpboon/Personal Project/FIlesToolkit/modules/folder-access/android/src/main/res
+expo.modules.filetoolkit.folderaccess.filetoolkit-folder-access-release-6 /Users/kpboon/Personal Project/FIlesToolkit/modules/folder-access/android/src/release/res
