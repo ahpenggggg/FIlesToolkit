@@ -191,6 +191,7 @@
   <com.android.installreferrer/>
   <com.android.internal.settings/>
   <com.android.java.tools.build/>
+  <com.android.keyattestation/>
   <com.android.kotlin.multiplatform.library/>
   <com.android.legacy-kapt/>
   <com.android.library/>

@@ -1,0 +1,2 @@
+ninja: Entering directory `/Users/kpboon/Personal Project/FIlesToolkit/modules/compress/android/.cxx/RelWithDebInfo/b1021f4f/armeabi-v7a'
+[1/1] Linking C shared library "/Users/kpboon/Personal Project/FIlesToolkit/modules/compress/android/build/intermediates/cxx/RelWithDebInfo/b1021f4f/obj/armeabi-v7a/libftx264.so"

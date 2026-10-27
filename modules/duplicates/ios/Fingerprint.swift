@@ -40,8 +40,8 @@ struct FrameFeature {
 enum PerceptualHash {
   private static let n = 64
   private static let k = 16
-  private static let cosTable: [[Double]] = (0..<k).map { u in
-    (0..<n).map { x in cos(Double(2 * x + 1) * Double(u) * Double.pi / Double(2 * n)) }
+  private static let cosTable: [[Double]] = (0..<k).map { (u: Int) -> [Double] in
+    (0..<n).map { (x: Int) -> Double in cos(Double(2 * x + 1) * Double(u) * Double.pi / Double(2 * n)) }
   }
 
   /// nil for near-uniform images (black pocket shots, blank screens).

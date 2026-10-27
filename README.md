@@ -1,18 +1,20 @@
 # FileToolkit
 
-On-device tools for tidying a phone, in one React Native / Expo app (Android and iOS). It combines DupeSweep (Duplicates, Compress video) and FolderRenamer (Folder names, File names), plus Archives (Android). Nothing leaves the phone.
+On-device tools for tidying a phone, in one React Native / Expo app (Android and iOS). It combines DupeSweep (Duplicates, Compress video) and FolderRenamer (Folder names, File names), plus Archives. Compress video and Archives are Android only. Nothing leaves the phone.
 
 | Tool | What it does |
 |---|---|
 | **Duplicates** | Finds photos and videos that are ≥ 80% similar (adjustable), keeps the best copy of each group and pre-selects the rest for Trash. |
-| **Compress video** | Re-encodes videos to HEVC MP4 with Resolution and Quality presets, a live size estimate, per-video % progress, and a toggle to send originals to Trash or keep them. |
+| **Compress video** (Android) | Re-encodes videos with HandBrake's settings (default preset, 720p HD, RF 26) using x264, in the background with a progress notification. |
 | **Folder names** | Renames each child folder of a picked folder from its photo and video count, e.g. `1V20P` or `JAMES_22V21P`. |
 | **File names** | Groups files with look-alike names so each group can be renamed in one go: `Name_00001.jpg`, `Name_00002.mp4`, … |
 | **Archives** (Android) | Creates ZIPs from files and folders, with an AES-256 password and/or split into parts; extracts ZIP (incl. split and password), RAR 4/5 (incl. password and multi-part) and 7Z. |
 
-The app opens on a home screen listing every tool. The tool that was open last time reopens on launch, but **nothing is scanned automatically**: each tool waits for you to choose folders and press a button.
+The app opens on a home screen with a grid of tool tiles (what each tool does is in the info tip on its screen). The tool that was open last time reopens on launch, but **nothing is scanned automatically**: each tool waits for you to choose folders and press a button.
 
-- **Duplicates / Compress video:** no folders are selected by default. Choose **All** or specific folders first; Compress lists videos only after you choose folders or tap **Find videos**.
+**One task at a time.** A tool's screen stays alive after you leave it (tabs without a tab bar, see `src/app/_layout.tsx`), so a running scan, rename or archive job keeps going and opening the tool again shows its progress. While it runs, its home tile shows *Running* and every other tool shows "… is running" with an **Open** button in place of its action (`src/lib/tasks.ts`).
+
+- **Duplicates / Compress video:** no folders are selected by default. Choose **All** or specific folders first; Compress lists videos only after you tap **Find videos**.
 - **Folder names / File names:** the folder you picked is remembered (with its name), but it is only read when you pick it or tap **Scan folder** / **Rescan**.
 
 Every tool chooses folders (and files) the same way, with the shared `folder-picker` module: a **Folders card** on the tool screen and a **Choose folders sheet** that shows one level at a time with a path bar (`Storage › Internal storage › Download`), ticks, All / None and, for media, *Include subfolders*. Duplicates and Compress tick media folders; Folder names and File names pick one folder (storage roots, `Download` itself and `Android/` are protected); Archives picks files and folders to zip, an archive to extract, and destination folders. On iOS the rename tools use the Files folder picker, since iOS has no shared storage to browse. Folders and files are listed in natural order (`IMG_2` before `IMG_10`).
@@ -28,6 +30,7 @@ On launch the app checks its two permissions and, if one is missing, shows what 
 | Permission | Used by | How it is granted |
 |---|---|---|
 | Photos and videos (`READ_MEDIA_IMAGES` / `READ_MEDIA_VIDEO`) | Duplicates, Compress video | system prompt |
+| Notifications (`POST_NOTIFICATIONS`) | Compress video (progress while in the background) | system prompt when compressing starts; optional |
 | All files access (`MANAGE_EXTERNAL_STORAGE`) | Folder names, File names, Archives | toggle in Settings (the app opens the page) |
 
 Each tool also checks again before it needs the permission. *All files access* is fine for sideloading; Google Play only allows it for apps whose core purpose is file management.
@@ -48,9 +51,11 @@ modules/
   duplicates/            Duplicates
     DuplicatesScreen.tsx, settings.ts, engine.ts (typed native API)
     android/ ios/        fingerprinting (256-bit DCT pHash + 8×8 colour, cached) and grouping
-  compress/              Compress video
-    CompressScreen.tsx, plan.ts (presets, size estimate), settings.ts, engine.ts
-    android/ ios/        HEVC encoder, quality check, save to library
+  compress/              Compress video (Android)
+    CompressScreen.tsx, plan.ts (output size, skip rules), settings.ts, engine.ts
+    android/             Transcoder.kt (decode → scale → x264 → MP4, AAC audio), X264.kt + cpp/x264_bridge.c
+                         (JNI, Lanczos-3 scaler), CompressService.kt (foreground service), x264/ (prebuilt
+                         static libraries per ABI and build.sh)
   folder-rename/         Folder names
     FolderRenameScreen.tsx, naming.ts (target names, conflicts), settings.ts, engine.ts
     android/ ios/        recursive photo/video count per child folder
@@ -64,7 +69,7 @@ modules/
     FolderPickerSheet.tsx  the Choose folders sheet: one level at a time, path bar, ticks, single/multiple
     FolderScopeCard.tsx    the Folders card: what is chosen, Choose / Change, hint
     types.ts               FolderSource: implement it to feed the picker from anywhere
-  media-library/         shared by Duplicates and Compress
+  media-library/         used by Duplicates and Compress
     folderSource.ts      the photo library as a FolderSource; useMediaScope.tsx (card + picker + permission)
     permissions.ts, android/ ios/ (folder tree / albums, Trash, item registry)
   folder-access/         shared by Folder names, File names and Archives
@@ -80,7 +85,7 @@ assets/brand/            wordmark PNGs used on the home screen, brand SVG master
 
 1. Create `modules/<tool>/` with its screen as the default export of `index.ts` (plus `android/`, `ios/` and `expo-module.config.json` if it needs native code).
 2. Add `src/app/<route>.tsx` containing `export { default } from '@modules/<tool>';`.
-3. Add an entry to `TOOLS` in `src/tools.ts` (route, title, one-line summary, section, icon, tint, and `platforms` if it isn't on both). It appears on the home screen; new sections go in `TOOL_GROUPS`.
+3. Add an entry to `TOOLS` in `src/tools.ts` (route, title, one-line summary, section, icon, tint, and `platforms` if it isn't on both). It appears as a tile on the home screen, next to the other tools of its group; new groups go in `TOOL_GROUPS`.
 4. Build the screen from the shared parts so it looks and behaves like the rest: `ToolScreen`, `Hero`, an `ActionButton` for the next step, `FolderScopeCard` + `FolderPickerSheet` fed by `createMediaFolderSource` or `createStorageFolderSource` (or your own `FolderSource`), and `ProgressCard`.
 
 Feature modules declare their shared module as a native dependency: `implementation project(':filetoolkit-media-library')` in Gradle and `s.dependency 'FileToolkitMediaLibrary'` in the podspec.
@@ -90,13 +95,27 @@ Feature modules declare their shared module as a native dependency: `implementat
 | Media library | MediaStore, real folder tree | PhotoKit, albums |
 | Fingerprints | 256-bit DCT pHash + 8×8 colour, cached | same algorithm, ported |
 | Grouping | closest-pairs-first, complete linkage, 5% split gap | same, ported |
-| Video encode | Media3 Transformer, HEVC (H.264 fallback), scale and fps cap | AVAssetReader/Writer, HEVC; the composition handles rotation, scale, fps cap and HDR→SDR |
-| Audio | copied untouched | copied untouched (AAC 128k fallback) |
-| Quality check | 5-frame match, ±1 s; unsure → `_compressed` copy, original kept | size and duration checks |
-| Save | `Download/Compressed/`, same capture date | same date, location, favourite and albums |
-| Delete (if toggled on) | system Trash dialog (30 days) | Recently Deleted (system dialog) |
+| Delete | system Trash dialog (30 days) | Recently Deleted (system dialog) |
 | Folder access | in-app folder tree, All files access | Files folder picker, saved bookmark |
 | Renaming | `File.renameTo`, two-phase | `FileManager.moveItem`, two-phase |
+
+## Compress video (Android)
+
+Fixed settings, copied from HandBrake's default preset (**Fast 1080p30**) with *Resolution Limit* set to **720p HD**, at **RF 26** (RF 28 looked slightly blocky) — no knobs:
+
+| | |
+|---|---|
+| Video | H.264 with **x264** (the encoder HandBrake uses), preset *fast*, profile Main, level 4.0, constant quality **RF 26**, keyframes at most 10 s apart |
+| Picture | fitted inside 1280×720 (720×1280 for portrait), aspect ratio kept, never enlarged; Lanczos-3 scaling |
+| Frame rate | same as the source, capped at 30 fps |
+| Audio | AAC 160 kbps stereo |
+| Container | MP4, rotation kept |
+
+Constant quality (RF) means the bitrate follows the picture: busy scenes get more bits, still ones fewer, so sizes vary from video to video. A result is only kept if it saves at least 1 MB and 10%, and it passes a duration and picture check; HDR videos are skipped for now. Phones decode with the hardware decoder and encode on the CPU, so it is slow (minutes per minute of 1080p video). Compressing runs in a foreground service with a progress notification and a wake lock, so it carries on in the background or with the screen off.
+
+Checked against desktop x264 at the same settings (`ffmpeg -c:v libx264 -preset fast -crf 28 -profile:v main -level 4.0`, Lanczos scaling, tested while the app used RF 28): same picture quality (SSIM 0.984 vs 0.984 on a 1080p → 720p clip).
+
+**Licence:** x264 is GPL-2.0-or-later, so an APK that contains it must be distributed under the GPL (fine for personal and sideloaded use). Rebuild the libraries with `modules/compress/android/x264/build.sh <x264 source>` (the commit used is in `X264_COMMIT`).
 
 ## Folder names
 
@@ -137,16 +156,6 @@ Both rename tools rename in two passes (everything to a temporary name first, th
 | 7Z, TAR, GZ and more | no | yes, via the 7-Zip engine (also split `.7z.001` …, incl. password and encrypted names) |
 
 Libraries: [zip4j](https://github.com/srikanth-lingala/zip4j) 2.11.5 (Maven Central) and [7-Zip-JBinding-4Android](https://github.com/omicronapps/7-Zip-JBinding-4Android) 16.02-2.03 (JitPack, added through `expo-build-properties`); both are 16 KB page-size ready.
-
-## Compression presets (HEVC; H.264 gets 1.5× the bitrate)
-
-| Preset | 1080p30 | 720p30 | Extra limits |
-|---|---|---|---|
-| High | ~4.4 Mbps | ~1.9 Mbps | keeps frame rate |
-| Balanced | ~2.2 Mbps | ~1.0 Mbps | ≤ 45% of the source bitrate, max 30 fps |
-| Small | ~1.2 Mbps | ~0.55 Mbps | ≤ 25% of the source bitrate, max 30 fps |
-
-A result is only kept if it is **≥ 1 MB smaller**. Videos under 5 MB are hidden.
 
 ## Requirements
 
@@ -207,6 +216,5 @@ npm test               # file-grouping, folder-naming and name-input rules
 
 ## Platform notes
 
-- **iOS iCloud:** videos that exist only in iCloud are greyed out ("download it in Photos first"). Photos are fingerprinted from a small derivative, so they work.
+- **iOS iCloud:** photos that exist only in iCloud are fingerprinted from a small derivative, so they work.
 - **iOS** has no media folders, so the media picker shows albums and smart albums (Videos, Screenshots, Selfies, Screen Recordings, Bursts). The rename tools use folders picked in the Files app.
-- **Keep the app open** while compressing. The screen is kept awake automatically.

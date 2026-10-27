@@ -8,21 +8,26 @@ version = '1.0.0'
 
 android {
   namespace "expo.modules.filetoolkit.compress"
+  ndkVersion rootProject.ext.has('ndkVersion') ? rootProject.ext.ndkVersion : '27.1.12297006'
   defaultConfig {
     versionCode 1
     versionName "1.0.0"
+    externalNativeBuild {
+      cmake {
+        // x264 is prebuilt for exactly these (x264/build.sh).
+        abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+      }
+    }
   }
-  lint {
-    // Media3 Transformer APIs are @UnstableApi; don't let lint block release builds.
-    abortOnError false
-    checkReleaseBuilds false
+  externalNativeBuild {
+    cmake {
+      path 'src/main/cpp/CMakeLists.txt'
+      version '3.22.1'
+    }
   }
 }
 
 dependencies {
   implementation project(':filetoolkit-media-library')
-  implementation "androidx.media3:media3-transformer:1.5.1"
-  implementation "androidx.media3:media3-effect:1.5.1"
-  implementation "androidx.media3:media3-common:1.5.1"
   implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0"
 }

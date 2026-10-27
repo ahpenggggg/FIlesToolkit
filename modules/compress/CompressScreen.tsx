@@ -1,7 +1,7 @@
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { Image } from 'expo-image';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, FlatList, PermissionsAndroid, Platform, Pressable, StyleSheet, View } from 'react-native';
 import {
   ActionButton,
   Button,
@@ -13,7 +13,6 @@ import {
   Icon,
   ProgressBar,
   SectionLabel,
-  Segmented,
   ToggleRow,
   ToolScreen,
   Txt,
@@ -23,9 +22,10 @@ import {
 } from '@/ui';
 import { bytes, duration, percentSaved } from '@/lib/format';
 import { usePersistentState } from '@/lib/settings';
+import { useTaskLock } from '@/lib/tasks';
 import { MediaLibrary, isCancelled, trashName, useMediaScope } from '../media-library';
 import { Compressor, type VideoAsset } from './engine';
-import { AUTO_MIN_VIDEO_BYTES, PRESETS, RESOLUTIONS, planVideo, presetOf, type Plan } from './plan';
+import { AUTO_MIN_VIDEO_BYTES, HANDBRAKE, outputSize, skipReason } from './plan';
 import { DEFAULT_COMPRESS_SETTINGS, type CompressSettings } from './settings';
 
 type JobStatus =
@@ -49,22 +49,15 @@ export default function CompressScreen() {
   const [status, setStatus] = useState<Record<string, JobStatus>>({});
   const [phase, setPhase] = useState<Phase>('browse');
   const cancelled = useRef(false);
-  const hevc = useMemo(() => {
-    try {
-      return Compressor.hevcSupported();
-    } catch {
-      return false;
-    }
-  }, []);
+  useTaskLock('compress', phase === 'running');
 
-  const plans = useMemo(() => {
-    const m = new Map<string, Plan>();
-    for (const v of videos ?? []) m.set(v.id, planVideo(v, settings.preset, settings.resolution, hevc));
+  const skips = useMemo(() => {
+    const m = new Map<string, string | null>();
+    for (const v of videos ?? []) m.set(v.id, skipReason(v));
     return m;
-  }, [videos, settings.preset, settings.resolution, hevc]);
+  }, [videos]);
 
-  // Selections the current preset/resolution can't compress are dropped automatically.
-  const selected = useMemo(() => new Set([...picked].filter((id) => plans.get(id)?.skipReason == null)), [picked, plans]);
+  const selected = useMemo(() => new Set([...picked].filter((id) => skips.get(id) == null)), [picked, skips]);
   const setSelected = setPicked;
 
   const scope = useMediaScope({
@@ -110,7 +103,7 @@ export default function CompressScreen() {
   }, []);
 
   const toggle = (id: string) => {
-    if (phase !== 'browse' || plans.get(id)?.skipReason) return;
+    if (phase !== 'browse' || skips.get(id)) return;
     setSelected((cur) => {
       const next = new Set(cur);
       if (next.has(id)) next.delete(id);
@@ -119,11 +112,10 @@ export default function CompressScreen() {
     });
   };
 
-  const compressible = (videos ?? []).filter((v) => plans.get(v.id)?.skipReason == null);
+  const compressible = (videos ?? []).filter((v) => skips.get(v.id) == null);
   const allOn = compressible.length > 0 && compressible.every((v) => selected.has(v.id));
   const chosen = (videos ?? []).filter((v) => selected.has(v.id));
   const before = chosen.reduce((n, v) => n + v.size, 0);
-  const after = chosen.reduce((n, v) => n + (plans.get(v.id)?.estimateBytes ?? v.size), 0);
 
   const savedBytes = chosen.reduce((n, v) => {
     const s = status[v.id];
@@ -133,28 +125,24 @@ export default function CompressScreen() {
   const start = async () => {
     cancelled.current = false;
     setPhase('running');
+    // The progress notification needs this on Android 13+; compressing works either way.
+    if (Platform.OS === 'android' && Number(Platform.Version) >= 33) {
+      await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS).catch(() => {});
+    }
     await activateKeepAwakeAsync(KEEP_AWAKE_TAG).catch(() => {});
+    Compressor.beginSession(`${chosen.length} video${chosen.length === 1 ? '' : 's'} queued`);
     const results: Record<string, JobStatus> = {};
     try {
-      for (const v of chosen) {
+      for (const [i, v] of chosen.entries()) {
         if (cancelled.current) break;
-        const plan = plans.get(v.id)!;
         setStatus((s) => ({ ...s, [v.id]: { kind: 'working', progress: null } }));
         let st: JobStatus;
         try {
-          const r = await Compressor.compressVideo({
-            id: v.id,
-            scale: plan.scale,
-            fps: plan.fps,
-            dropFrames: plan.dropFrames,
-            bitrate: plan.bitrate,
-          });
+          const r = await Compressor.compressVideo({ id: v.id, label: `${i + 1} of ${chosen.length}` });
           if (r.status === 'compressed') {
             const parts = [
-              `${r.codec} ${(plan.bitrate / 1e6).toFixed(1)} Mbps`,
-              plan.scale < 1 ? `${plan.outShortSide}p` : null,
-              plan.dropFrames ? `${plan.fps} fps` : null,
-              presetOf(settings.preset).label,
+              r.codec,
+              v.rotation === 90 || v.rotation === 270 ? `${r.height}×${r.width}` : `${r.width}×${r.height}`,
               r.match != null ? `match ${r.match.toFixed(2)}` : null,
               r.savedTo ? `saved to ${r.savedTo}` : null,
             ].filter(Boolean);
@@ -170,6 +158,7 @@ export default function CompressScreen() {
       }
     } finally {
       deactivateKeepAwake(KEEP_AWAKE_TAG);
+      Compressor.endSession();
     }
     setPhase('done');
     await replaceOriginals(results, settings.deleteOriginals);
@@ -216,7 +205,7 @@ export default function CompressScreen() {
         <>
           <Hero
             title="Shrink big videos."
-            body="Re-encodes videos to HEVC with a quality check and keeps a result only if it saves at least 1 MB. Everything runs on your phone."
+            body={`Re-encodes videos the way HandBrake does with its default preset at 720p and RF ${HANDBRAKE.rf} (x264). It takes a while, keeps going in the background with a notification, and keeps a result only if it saves at least 10%. Everything runs on your phone.`}
           />
           {scope.card}
         </>
@@ -224,21 +213,8 @@ export default function CompressScreen() {
 
       {browsing ? (
         <Card style={{ gap: 12 }}>
-          <SectionLabel>Resolution</SectionLabel>
-          <Segmented
-            options={RESOLUTIONS.map((r) => ({ key: r.key, label: r.label }))}
-            value={settings.resolution}
-            onChange={(k) => setSettings((s) => ({ ...s, resolution: k }))}
-          />
-          <SectionLabel>Quality</SectionLabel>
-          <Segmented
-            options={PRESETS.map((p) => ({ key: p.key, label: p.label }))}
-            value={settings.preset}
-            onChange={(k) => setSettings((s) => ({ ...s, preset: k }))}
-          />
-          <Txt v="caption" color={c.muted}>
-            {presetOf(settings.preset).description}
-          </Txt>
+          <SectionLabel>HandBrake settings</SectionLabel>
+          <Txt v="small">{HANDBRAKE.summary}</Txt>
           <Divider />
           <ToggleRow
             label="Delete originals"
@@ -283,7 +259,7 @@ export default function CompressScreen() {
         ? { label: 'Reading videos…', disabled: true }
         : chosen.length === 0
           ? { label: 'Select videos to compress', disabled: true }
-          : { label: `Compress ${chosen.length} · ${bytes(before)} → ~${bytes(after)}`, icon: 'arrow-collapse-all', onPress: start };
+          : { label: `Compress ${chosen.length} · ${bytes(before)}`, icon: 'arrow-collapse-all', onPress: start };
 
   return (
     <ToolScreen
@@ -304,7 +280,10 @@ export default function CompressScreen() {
         keyExtractor={(v) => v.id}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 20, flexGrow: 1 }}
         ListHeaderComponent={header}
-        ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
+        ItemSeparatorComponent={Gap}
+        initialNumToRender={8}
+        windowSize={7}
+        removeClippedSubviews
         ListEmptyComponent={
           !scope.chosen ? (
             <EmptyState icon="folder-search-outline" title="Choose folders first" body="Pick all folders or specific ones to list their videos over 5 MB." />
@@ -324,11 +303,11 @@ export default function CompressScreen() {
         renderItem={({ item }) => (
           <VideoRow
             v={item}
-            plan={plans.get(item.id)!}
-            status={status[item.id] ?? { kind: 'pending' }}
+            skip={skips.get(item.id) ?? null}
+            status={status[item.id] ?? PENDING}
             selected={selected.has(item.id)}
             editable={browsing}
-            onPress={() => toggle(item.id)}
+            onToggle={toggle}
           />
         )}
       />
@@ -353,9 +332,9 @@ function RunningPanel({ chosen, status, savedBytes, onCancel }: { chosen: VideoA
         <ProgressBar progress={chosen.length ? processed / chosen.length : 0} />
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-        <Icon name="cellphone-lock" size={16} color={c.muted} />
+        <Icon name="bell-outline" size={16} color={c.muted} />
         <Txt v="caption" color={c.muted} style={{ flex: 1 }}>
-          Keep the app open
+          Slow but thorough. You can leave the app: progress shows in the notification.
         </Txt>
         <Button label="Cancel" variant="secondary" size="sm" onPress={onCancel} />
       </View>
@@ -390,33 +369,52 @@ function DonePanel({ chosen, status, savedBytes, onDone }: { chosen: VideoAsset[
   );
 }
 
-function VideoRow({
+const PENDING: JobStatus = { kind: 'pending' };
+const Gap = () => <View style={{ height: 8 }} />;
+
+/** The video's system thumbnail, fetched once and cached as a small JPEG (cheap when scrolling fast). */
+function useThumbnail(id: string): string | null {
+  const [uri, setUri] = useState<{ id: string; uri: string | null } | null>(null);
+  useEffect(() => {
+    let live = true;
+    Compressor.thumbnail(id, 160)
+      .then((u) => live && setUri({ id, uri: u }))
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, [id]);
+  return uri?.id === id ? uri.uri : null;
+}
+
+const VideoRow = memo(function VideoRow({
   v,
-  plan,
+  skip,
   status,
   selected,
   editable,
-  onPress,
+  onToggle,
 }: {
   v: VideoAsset;
-  plan: Plan;
+  skip: string | null;
   status: JobStatus;
   selected: boolean;
   editable: boolean;
-  onPress: () => void;
+  onToggle: (id: string) => void;
 }) {
   const c = usePalette();
-  const dim = editable && plan.skipReason != null;
+  const thumb = useThumbnail(v.id);
+  const dim = editable && skip != null;
   const short = Math.min(v.codedWidth || v.width, v.codedHeight || v.height);
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => onToggle(v.id)}
       disabled={!editable || dim}
       style={[styles.row, { backgroundColor: c.surface, borderColor: selected ? c.accent : c.line, opacity: dim ? 0.6 : 1 }]}
     >
       {editable ? <Checkbox checked={selected} disabled={dim} /> : null}
       <View style={[styles.thumb, { backgroundColor: c.sunken }]}>
-        <Image source={{ uri: v.uri }} style={StyleSheet.absoluteFill} contentFit="cover" recyclingKey={v.id} />
+        {thumb ? <Image source={{ uri: thumb }} style={StyleSheet.absoluteFill} contentFit="cover" recyclingKey={v.id} /> : null}
       </View>
       <View style={{ flex: 1, gap: 2 }}>
         <Txt v="smallStrong" numberOfLines={1}>
@@ -425,23 +423,26 @@ function VideoRow({
         <Txt v="caption" color={c.muted}>
           {[bytes(v.size), short > 0 ? `${short}p` : null, duration(v.durationMs)].filter(Boolean).join(' · ')}
         </Txt>
-        <StatusLine v={v} plan={plan} status={status} />
+        <StatusLine v={v} skip={skip} status={status} />
       </View>
     </Pressable>
   );
-}
+});
 
-function StatusLine({ v, plan, status }: { v: VideoAsset; plan: Plan; status: JobStatus }) {
+function StatusLine({ v, skip, status }: { v: VideoAsset; skip: string | null; status: JobStatus }) {
   const c = usePalette();
   switch (status.kind) {
-    case 'pending':
-      return plan.skipReason ? (
-        <Txt v="caption" color={c.faint} numberOfLines={2}>
-          {plan.skipReason}
-        </Txt>
-      ) : (
-        <Txt v="caption" color={c.accent} style={{ fontWeight: '700' }}>{`→ ~${bytes(plan.estimateBytes)} (−${percentSaved(v.size, plan.estimateBytes)}%)`}</Txt>
-      );
+    case 'pending': {
+      if (skip) {
+        return (
+          <Txt v="caption" color={c.faint} numberOfLines={2}>
+            {skip}
+          </Txt>
+        );
+      }
+      const out = outputSize(v);
+      return <Txt v="caption" color={c.accent} style={{ fontWeight: '700' }}>{`→ ${out.width}×${out.height} · RF ${HANDBRAKE.rf}`}</Txt>;
+    }
     case 'working': {
       const p = status.progress;
       return (

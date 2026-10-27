@@ -12,7 +12,7 @@ export interface Tool {
   /** Expo Router path of the tool's screen. */
   route: `/${string}`;
   title: string;
-  /** One line on the home screen. */
+  /** What the tool does, in one line (read out by screen readers on the home screen). */
   summary: string;
   group: ToolGroup;
   icon: IconName;
@@ -24,7 +24,7 @@ export interface Tool {
 
 export type ToolKey = 'duplicates' | 'compress' | 'folders' | 'files' | 'archives';
 
-/** Home screen sections, in order. */
+/** Tool groups, in home screen order: tools of a group sit together. */
 export const TOOL_GROUPS = ['Media cleanup', 'Organize', 'Archive'] as const;
 export type ToolGroup = (typeof TOOL_GROUPS)[number];
 
@@ -42,10 +42,11 @@ export const TOOLS: Tool[] = [
     key: 'compress',
     route: '/compress',
     title: 'Compress video',
-    summary: 'Re-encode large videos to HEVC and free up space',
+    summary: 'Shrink videos with HandBrake settings: 720p, RF 26',
     group: 'Media cleanup',
     icon: 'movie-open-outline',
     tint: { light: '#6A47D1', dark: '#BBA6FF' },
+    platforms: ['android'],
   },
   {
     key: 'folders',

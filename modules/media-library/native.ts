@@ -1,7 +1,7 @@
 import { NativeModule, requireNativeModule } from 'expo';
 
 /**
- * Shared photo/video library access (Kotlin on Android, Swift on iOS), used by Duplicates and Compress.
+ * Shared photo/video library access (Kotlin on Android, Swift on iOS), used by Duplicates.
  * Android: real directories via MediaStore. iOS: albums via PhotoKit.
  */
 

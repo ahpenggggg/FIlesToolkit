@@ -10,15 +10,10 @@ import android.provider.MediaStore
 import java.io.File
 import kotlin.math.min
 
-/** A compressed file is only kept if it is at least this much smaller than the original. */
+/** A compressed file is only kept if it saves at least 1 MB and a tenth of the original. */
 const val MIN_SAVING: Long = 1L shl 20 // 1 MB
 
-sealed interface Outcome {
-    /** [review] non-null = quality check was inconclusive: save as a separate copy and keep the original. */
-    data class Compressed(val file: File, val mime: String, val ext: String, val note: String, val review: String? = null) : Outcome
-    data class Skipped(val reason: String) : Outcome
-    data class Failed(val reason: String) : Outcome
-}
+fun minSavingFor(size: Long): Long = maxOf(MIN_SAVING, size / 10)
 
 fun mb(bytes: Long): String =
     if (bytes >= 1L shl 30) "%.2f GB".format(bytes / 1073741824.0) else "%.1f MB".format(bytes / 1048576.0)

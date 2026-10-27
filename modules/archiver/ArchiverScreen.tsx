@@ -1,4 +1,5 @@
 import { usePersistentState } from '@/lib/settings';
+import { useTaskLock } from '@/lib/tasks';
 import { ActionButton, Hero, Notice, ProgressCard, Segmented, ToolScreen } from '@/ui';
 import { DEFAULT_ARCHIVER_SETTINGS, type ArchiverSettings } from './settings';
 import { useArchiveJob } from './useArchiveJob';
@@ -9,6 +10,7 @@ export default function ArchiverScreen() {
   const [settings, setAll] = usePersistentState<ArchiverSettings>('archives.settings', DEFAULT_ARCHIVER_SETTINGS);
   const setSettings = (change: Partial<ArchiverSettings>) => setAll((s) => ({ ...s, ...change }));
   const job = useArchiveJob();
+  useTaskLock('archives', job.running);
   const create = useCreateZip(settings, setSettings, job);
   const extract = useExtractArchive(settings, setSettings, job);
   const pane = settings.mode === 'create' ? create : extract;

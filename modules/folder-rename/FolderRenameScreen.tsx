@@ -12,6 +12,7 @@ export default function FolderRenameScreen() {
   const [settings, setSettings] = usePersistentState<FolderRenameSettings>('folders.settings', DEFAULT_FOLDER_RENAME_SETTINGS);
   const tool = useFolderTool<FolderScan>({
     storageKey: 'folders.folder',
+    tool: 'folders',
     task: 'folders',
     noun: 'folder',
     plural: 'folders',
@@ -91,7 +92,7 @@ export default function FolderRenameScreen() {
       action={<ActionButton action={action} />}
     >
       <Hero
-        title={"Rename folders by\nwhat's inside them."}
+        title="Rename folders by what's inside them."
         body="Pick a parent folder, preview the video and photo count of every child folder, then rename them in one go."
       />
 
@@ -136,7 +137,7 @@ export default function FolderRenameScreen() {
 
       <SectionLabel
         style={{ marginTop: 10 }}
-        right={scan && !tool.busy ? <Button label="Rescan" icon="refresh" variant="ghost" size="sm" onPress={tool.scan} /> : null}
+        right={scan && !tool.busy && !tool.blocked ? <Button label="Rescan" icon="refresh" variant="ghost" size="sm" onPress={tool.scan} /> : null}
       >
         Preview
       </SectionLabel>

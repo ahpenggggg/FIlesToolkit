@@ -2,6 +2,9 @@ package expo.modules.filetoolkit.compress
 
 import android.content.ContentUris
 import android.content.Context
+import android.graphics.Bitmap
+import android.net.Uri
+import android.util.Size
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
@@ -32,10 +35,8 @@ class ListVideosOptions : Record {
 
 class CompressOptions : Record {
     @Field val id: String = ""
-    @Field val scale: Double = 1.0
-    @Field val fps: Double = 0.0
-    @Field val dropFrames: Boolean = false
-    @Field val bitrate: Double = 2_000_000.0
+    /** Shown in the notification, e.g. "2 of 5". */
+    @Field val label: String = ""
 }
 
 class RenameItem : Record {
@@ -55,7 +56,15 @@ class CompressModule : Module() {
         Name("FTCompress")
         Events("onCompressProgress")
 
-        Function("hevcSupported") { VideoEncoder.hevcAvailable }
+        /** Starts the foreground service for a batch, so it keeps going in the background. */
+        Function("beginSession") { text: String -> CompressService.start(ctx, text) }
+
+        Function("endSession") { CompressService.stop(ctx) }
+
+        /** A small cached JPEG of the video's system thumbnail (cheap to scroll through). */
+        AsyncFunction("thumbnail") { id: String, size: Int, promise: Promise ->
+            scope.launchFor(promise) { thumbnail(id, size) }
+        }
 
         AsyncFunction("listVideos") { opts: ListVideosOptions, promise: Promise ->
             scope.launchFor(promise) { listVideos(opts) }
@@ -89,7 +98,7 @@ class CompressModule : Module() {
             items.map { item ->
                 async(Dispatchers.IO) {
                     gate.withPermit {
-                        val info = VideoEncoder.probe(ctx, item)
+                        val info = Transcoder.probe(ctx, item)
                         MediaRegistry.asset(item) + mapOf(
                             "readable" to (info != null),
                             "fps" to (info?.fps ?: 0.0),
@@ -98,6 +107,8 @@ class CompressModule : Module() {
                             "codedWidth" to (info?.width ?: item.width),
                             "codedHeight" to (info?.height ?: item.height),
                             "probedDurationMs" to (info?.durationMs ?: item.durationMs).toDouble(),
+                            "videoCodec" to info?.mime,
+                            "hdr" to (info?.hdr ?: false),
                             "cloudOnly" to false,
                         )
                     }
@@ -109,9 +120,15 @@ class CompressModule : Module() {
     private suspend fun compress(o: CompressOptions): Map<String, Any?> {
         val item = MediaRegistry.item(o.id) ?: return mapOf("status" to "failed", "reason" to "Video not found — refresh the list")
         val workDir = File(ctx.cacheDir, "compress").apply { mkdirs() }
-        val params = EncodeParams(o.scale.toFloat(), o.fps, o.dropFrames, o.bitrate.toLong())
-        val outcome = VideoEncoder.encode(ctx, item, workDir, params) { p ->
-            sendEvent("onCompressProgress", mapOf("id" to o.id, "progress" to p.toDouble()))
+        var shown = -1
+        CompressService.update(ctx, notificationText(o, item.name), -1)
+        val outcome = Transcoder.encode(ctx, item, workDir) { p ->
+            val percent = (p * 100).toInt()
+            if (percent != shown) {
+                shown = percent
+                sendEvent("onCompressProgress", mapOf("id" to o.id, "progress" to p.toDouble()))
+                CompressService.update(ctx, notificationText(o, item.name), percent)
+            }
         }
         return when (outcome) {
             is EncodeOutcome.Skipped -> mapOf("status" to "skipped", "reason" to outcome.reason)
@@ -132,7 +149,9 @@ class CompressModule : Module() {
                     "newSize" to newSize.toDouble(),
                     "review" to outcome.review,
                     "match" to outcome.match,
-                    "codec" to if (VideoEncoder.hevcAvailable) "HEVC" else "H.264",
+                    "codec" to HandBrake.LABEL,
+                    "width" to outcome.width,
+                    "height" to outcome.height,
                     "savedTo" to MediaWriter.COMPRESSED_FOLDER,
                     "finalName" to MediaWriter.finalName(item, "mp4"),
                 )
@@ -141,6 +160,25 @@ class CompressModule : Module() {
             } finally {
                 outcome.file.delete()
             }
+        }
+    }
+
+    private fun notificationText(o: CompressOptions, name: String) = if (o.label.isEmpty()) name else "${o.label} · $name"
+
+    private val thumbGate = Semaphore(2)
+
+    private suspend fun thumbnail(id: String, size: Int): String? = thumbGate.withPermit {
+        withContext(Dispatchers.IO) {
+            val item = MediaRegistry.item(id) ?: return@withContext null
+            val dir = File(ctx.cacheDir, "thumbs").apply { mkdirs() }
+            val file = File(dir, "${id.replace(':', '_')}_${item.dateModified}_$size.jpg")
+            if (!file.exists()) {
+                val bmp = runCatching { ctx.contentResolver.loadThumbnail(item.uri, Size(size, size), null) }.getOrNull()
+                    ?: return@withContext null
+                file.outputStream().use { bmp.compress(Bitmap.CompressFormat.JPEG, 80, it) }
+                bmp.recycle()
+            }
+            Uri.fromFile(file).toString()
         }
     }
 }

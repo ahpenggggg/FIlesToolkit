@@ -50,6 +50,7 @@ export default function FileRenameScreen() {
   const [settings, setSettings] = usePersistentState<FileRenameSettings>('files.settings', DEFAULT_FILE_RENAME_SETTINGS);
   const tool = useFolderTool<FilesData>({
     storageKey: 'files.folder',
+    tool: 'files',
     task: 'files',
     noun: 'file',
     plural: 'files',
@@ -161,7 +162,7 @@ export default function FileRenameScreen() {
   const header = (
     <View style={styles.header}>
       <Hero
-        title={'Tidy up files with\nlook-alike names.'}
+        title="Tidy up files with look-alike names."
         body="Similar names such as file1, file(2) and fileee12 are grouped. Name a group and its files become Name_00001, Name_00002 and so on."
       />
 
@@ -202,7 +203,7 @@ export default function FileRenameScreen() {
 
       <SectionLabel
         style={{ marginTop: 10 }}
-        right={data && !tool.busy ? <Button label="Rescan" icon="refresh" variant="ghost" size="sm" onPress={tool.scan} /> : null}
+        right={data && !tool.busy && !tool.blocked ? <Button label="Rescan" icon="refresh" variant="ghost" size="sm" onPress={tool.scan} /> : null}
       >
         Groups
       </SectionLabel>

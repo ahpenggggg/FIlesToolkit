@@ -1,0 +1,5 @@
+# ninja log v5
+0	147	1792336558396210312	CMakeFiles/ftx264.dir/x264_bridge.c.o	bb3c1b194fe6434b
+150	237	1792336558479109702	/Users/kpboon/Personal Project/FIlesToolkit/modules/compress/android/build/intermediates/cxx/RelWithDebInfo/b1021f4f/obj/x86/libftx264.so	201daa9481a209a8
+1	65	1792337360688836573	/Users/kpboon/Personal Project/FIlesToolkit/modules/compress/android/build/intermediates/cxx/RelWithDebInfo/b1021f4f/obj/x86/libftx264.so	201daa9481a209a8
+1	39	1792390312704621534	/Users/kpboon/Personal Project/FIlesToolkit/modules/compress/android/build/intermediates/cxx/RelWithDebInfo/b1021f4f/obj/x86/libftx264.so	201daa9481a209a8

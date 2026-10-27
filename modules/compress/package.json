@@ -1,10 +1,10 @@
 {
   "name": "filetoolkit-compress",
   "version": "1.0.0",
-  "description": "FileToolkit Compress video: HEVC re-encoding with a quality check",
+  "description": "FileToolkit Compress video: x264 with HandBrake settings (Android)",
   "main": "index.ts",
   "types": "index.ts",
-  "license": "MIT",
+  "license": "GPL-2.0-or-later",
   "author": "JP",
   "homepage": "https://github.com/ahpenggggg"
 }

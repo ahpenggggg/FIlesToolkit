@@ -23,6 +23,7 @@ import {
 } from '@/ui';
 import { bytes, duration } from '@/lib/format';
 import { usePersistentState } from '@/lib/settings';
+import { useTaskLock } from '@/lib/tasks';
 import { MediaLibrary, isCancelled, trashName, useMediaScope } from '../media-library';
 import { Duplicates, type DupGroup, type DupMember } from './engine';
 import { DEFAULT_DUPE_SETTINGS, type DupeSettings } from './settings';
@@ -37,6 +38,7 @@ export default function DuplicatesScreen() {
   const [groups, setGroups] = useState<DupGroup[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [deleting, setDeleting] = useState(false);
+  useTaskLock('duplicates', phase === 'scanning' || deleting);
 
   const scope = useMediaScope({
     kind: 'any',

@@ -12,8 +12,7 @@
       "supportsTablet": true,
       "deploymentTarget": "16.4",
       "infoPlist": {
-        "NSPhotoLibraryUsageDescription": "FileToolkit scans your photos and videos on-device to find duplicates and compress large videos.",
-        "NSPhotoLibraryAddUsageDescription": "FileToolkit saves compressed videos back to your library."
+        "NSPhotoLibraryUsageDescription": "FileToolkit scans your photos and videos on-device to find duplicates."
       },
       "buildNumber": "1"
     },

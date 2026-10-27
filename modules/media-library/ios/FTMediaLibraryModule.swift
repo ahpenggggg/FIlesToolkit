@@ -2,7 +2,7 @@ import AVFoundation
 import ExpoModulesCore
 import Photos
 
-/// Stops a long-running job; shared by Duplicates and Compress.
+/// Stops a long-running job (Duplicates).
 public final class CancelToken {
   private let lock = NSLock()
   private var flag = false

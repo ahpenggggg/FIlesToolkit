@@ -20,6 +20,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { bytes } from '@/lib/format';
+import { useBlockingTool } from '@/lib/tasks';
 import { toolOf, type ToolKey } from '@/tools';
 import { alpha, mono, radius, type, usePalette, type IconName, type TypeVariant } from './theme';
 
@@ -87,6 +88,8 @@ export function ToolScreen({
   scroll?: boolean;
 }) {
   const c = usePalette();
+  // One task at a time: while another tool's task runs, its notice takes the place of this tool's action.
+  const blocking = useBlockingTool(tool);
   return (
     // The window doesn't resize for the keyboard (edge-to-edge), so lift the content above it.
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: c.bg }} behavior="padding">
@@ -99,21 +102,46 @@ export function ToolScreen({
       ) : (
         <View style={{ flex: 1 }}>{children}</View>
       )}
-      {action ? <ActionBar>{action}</ActionBar> : null}
+      {blocking ? (
+        <ActionBar>
+          <BusyElsewhere tool={blocking} />
+        </ActionBar>
+      ) : action ? (
+        <ActionBar>{action}</ActionBar>
+      ) : null}
     </KeyboardAvoidingView>
   );
 }
 
-/** Small "On device" badge: nothing the tools do leaves the phone. */
-export function DeviceChip() {
+/** Shown instead of a tool's action while another tool's task is running. */
+function BusyElsewhere({ tool }: { tool: ToolKey }) {
   const c = usePalette();
+  const other = toolOf(tool);
   return (
-    <View style={[styles.deviceChip, { borderColor: c.line, backgroundColor: c.surface }]}>
-      <Icon name="shield-lock-outline" size={14} color={c.muted} />
-      <Txt v="caption" color={c.muted} style={{ fontWeight: '600' }}>
-        On device
-      </Txt>
-    </View>
+    <>
+      <View style={styles.busyRow}>
+        <ActivityIndicator size="small" color={c.accent} />
+        <View style={{ flex: 1 }}>
+          <Txt v="smallStrong">{`${other.title} is running`}</Txt>
+          <Txt v="caption" color={c.muted}>
+            One task at a time. This tool is ready once it finishes.
+          </Txt>
+        </View>
+      </View>
+      <Button label={`Open ${other.title}`} icon="arrow-right" variant="secondary" onPress={() => router.navigate(other.route)} />
+    </>
+  );
+}
+
+/** "Everything stays on this phone", one tap away behind a shield icon. */
+export function DeviceChip() {
+  return (
+    <InfoTip
+      icon="shield-lock-outline"
+      size={24}
+      label="On device"
+      text="Everything runs on this phone. Nothing is uploaded, and no account is needed."
+    />
   );
 }
 
@@ -121,7 +149,7 @@ export function DeviceChip() {
 export function Hero({ title, body }: { title: string; body: string }) {
   return (
     <View style={styles.hero}>
-      <Txt v="display" style={{ flex: 1 }}>
+      <Txt v="title" style={{ flex: 1 }}>
         {title}
       </Txt>
       <View style={styles.heroInfo}>
@@ -572,20 +600,12 @@ const styles = StyleSheet.create({
   iconTile: { alignItems: 'center', justifyContent: 'center' },
   header: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingBottom: 12 },
   back: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', borderWidth: StyleSheet.hairlineWidth },
-  deviceChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: radius.pill,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
   scroll: { paddingHorizontal: 16, paddingBottom: 24, gap: 12 },
-  hero: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, paddingHorizontal: 4, paddingTop: 4, paddingBottom: 12 },
-  heroInfo: { paddingTop: 6 },
+  hero: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, paddingHorizontal: 4, paddingTop: 2, paddingBottom: 4 },
+  heroInfo: { paddingTop: 2 },
   card: { borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth, padding: 16, gap: 10 },
   sectionLabel: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 4 },
+  busyRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   actionBar: { paddingHorizontal: 20, paddingTop: 12, borderTopWidth: StyleSheet.hairlineWidth, gap: 10 },
   empty: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 10 },
   emptyIcon: { width: 72, height: 72, borderRadius: 24, alignItems: 'center', justifyContent: 'center', marginBottom: 6 },
@@ -625,7 +645,18 @@ interface Anchor {
 }
 
 /** An info icon that shows `text` in a tooltip bubble under it; tap anywhere to close. */
-export function InfoTip({ text, label = 'More info', size = 22 }: { text: string; label?: string; size?: number }) {
+export function InfoTip({
+  text,
+  label = 'More info',
+  size = 22,
+  icon: name = 'information-outline',
+}: {
+  text: string;
+  label?: string;
+  size?: number;
+  /** An outline icon; its filled version shows while the tip is open. */
+  icon?: IconName;
+}) {
   const c = usePalette();
   const icon = useRef<View>(null);
   const [anchor, setAnchor] = useState<Anchor | null>(null);
@@ -644,7 +675,7 @@ export function InfoTip({ text, label = 'More info', size = 22 }: { text: string
         accessibilityHint={text}
         style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
       >
-        <Icon name={anchor ? 'information' : 'information-outline'} size={size} color={anchor ? c.accent : c.muted} />
+        <Icon name={anchor ? (name.replace(/-outline$/, '') as IconName) : name} size={size} color={anchor ? c.accent : c.muted} />
       </Pressable>
       <Modal transparent visible={anchor != null} animationType="fade" onRequestClose={close} statusBarTranslucent>
         <Pressable style={StyleSheet.absoluteFill} onPress={close} accessibilityRole="button" accessibilityLabel="Close">

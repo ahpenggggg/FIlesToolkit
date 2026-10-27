@@ -1,4 +1,4 @@
-import { Stack, usePathname } from 'expo-router';
+import { Tabs, usePathname } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
@@ -25,7 +25,15 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <StatusBar style="auto" />
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: c.bg }, animation: 'slide_from_right' }} />
+      {/*
+        Tabs without a tab bar: each tool's screen stays mounted once opened, so a running task and its
+        progress are still there after going home and back. Back always returns to the home screen.
+      */}
+      <Tabs
+        backBehavior="initialRoute"
+        tabBar={() => null}
+        screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: c.bg }, animation: 'shift', freezeOnBlur: true }}
+      />
       <PermissionGate />
     </SafeAreaProvider>
   );

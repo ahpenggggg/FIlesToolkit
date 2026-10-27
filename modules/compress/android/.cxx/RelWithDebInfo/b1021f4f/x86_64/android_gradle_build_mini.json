@@ -1,0 +1,27 @@
+{
+  "buildFiles": [
+    "/Users/kpboon/Personal Project/FIlesToolkit/modules/compress/android/src/main/cpp/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/kpboon/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/kpboon/Personal Project/FIlesToolkit/modules/compress/android/.cxx/RelWithDebInfo/b1021f4f/x86_64",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/kpboon/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/kpboon/Personal Project/FIlesToolkit/modules/compress/android/.cxx/RelWithDebInfo/b1021f4f/x86_64",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "ftx264::@6890427a1f51a3e7e1df": {
+      "artifactName": "ftx264",
+      "abi": "x86_64",
+      "output": "/Users/kpboon/Personal Project/FIlesToolkit/modules/compress/android/build/intermediates/cxx/RelWithDebInfo/b1021f4f/obj/x86_64/libftx264.so",
+      "runtimeFiles": []
+    }
+  }
+}

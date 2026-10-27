@@ -64,7 +64,7 @@ export function PermissionGate() {
         <PermissionRow
           icon="image-multiple-outline"
           title="Photos and videos"
-          body="Used by Duplicates and Compress video to read your library and move items to Trash."
+          body="Used by Duplicates to read your library and move items to Trash."
           status={media === 'granted' ? 'allowed' : media === 'limited' ? 'limited' : 'missing'}
           actionLabel={media === 'limited' ? 'Allow all' : 'Allow'}
           onAllow={allowMedia}

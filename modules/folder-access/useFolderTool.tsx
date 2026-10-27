@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, Platform } from 'react-native';
 import { usePersistentState } from '@/lib/settings';
+import { isBlocked, useBlockingTool, useTaskLock } from '@/lib/tasks';
+import type { ToolKey } from '@/tools';
 import type { Progress } from '@/ui';
 import { FolderPickerSheet, FolderScopeCard, type FolderSource } from '../folder-picker';
 import { FolderAccess, READ_FAILED, ensureAllFilesAccess, type RenameRequest } from './native';
@@ -14,6 +16,8 @@ export interface SavedFolder {
 }
 
 interface Options<T> {
+  /** The tool using it, for the one-task-at-a-time lock. */
+  tool: ToolKey;
   /** Where the chosen folder is remembered. */
   storageKey: string;
   /** Tags this tool's rename progress events. */
@@ -91,7 +95,7 @@ export function useFolderTool<T extends { rootName: string }>(options: Options<T
 
   /** Reads the chosen folder (Scan / Rescan). */
   const scan = () => {
-    if (!folder.uri) return;
+    if (!folder.uri || isBlocked(latest.current.tool)) return;
     setMessage(null);
     read(folder.uri);
   };
@@ -118,7 +122,7 @@ export function useFolderTool<T extends { rootName: string }>(options: Options<T
 
   /** Renames the items, shows the outcome and reads the folder again. */
   const rename = async (items: RenameRequest[]) => {
-    if (!folder.uri || items.length === 0) return;
+    if (!folder.uri || items.length === 0 || isBlocked(latest.current.tool)) return;
     const uri = folder.uri;
     const { task, noun, plural } = latest.current;
     setRenaming(true);
@@ -138,6 +142,9 @@ export function useFolderTool<T extends { rootName: string }>(options: Options<T
   };
 
   const busy = scanning || renaming;
+  useTaskLock(options.tool, busy);
+  /** Another tool's task is running, so this one can't scan or rename yet. */
+  const blocked = useBlockingTool(options.tool) != null;
   const summary = !folder.uri
     ? 'No folder chosen'
     : Platform.OS === 'android'
@@ -161,6 +168,7 @@ export function useFolderTool<T extends { rootName: string }>(options: Options<T
   );
 
   return {
+    blocked,
     folder,
     chosen: folder.uri != null,
     data,
