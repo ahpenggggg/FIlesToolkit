@@ -1,4 +1,5 @@
 import { Platform } from 'react-native';
+import { listSummary, plural } from '@/lib/format';
 import type { FolderNode, FolderSource } from '../folder-picker';
 import { MediaLibrary, type Folder } from './native';
 
@@ -15,7 +16,7 @@ export function folderSummary(ids: string[] | null, folders: Folder[] | null, in
   if (ids.length === 0) return 'All folders';
   const byId = new Map((folders ?? []).map((f) => [f.id, f]));
   const names = ids.map((id) => byId.get(id)?.path ?? id.split('/').pop() ?? id).sort();
-  const list = names.length <= 2 ? names.join(', ') : `${names.slice(0, 2).join(', ')} +${names.length - 2} more`;
+  const list = listSummary(names);
   return includeSubfolders && Platform.OS === 'android' ? `${list} (incl. subfolders)` : list;
 }
 
@@ -71,6 +72,6 @@ export function createMediaFolderSource(kind: 'any' | 'video'): FolderSource {
 }
 
 function counts(p: number, v: number) {
-  const parts = [p > 0 ? `${p} photo${p === 1 ? '' : 's'}` : null, v > 0 ? `${v} video${v === 1 ? '' : 's'}` : null].filter(Boolean);
+  const parts = [p > 0 ? plural(p, 'photo') : null, v > 0 ? plural(v, 'video') : null].filter(Boolean);
   return parts.length ? parts.join(' · ') : 'No media directly';
 }

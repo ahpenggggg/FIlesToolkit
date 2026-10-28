@@ -1,4 +1,0 @@
-/Users/kpboon/Library/Android/sdk/cmake/3.22.1/bin/ninja \
-  -C \
-  "/Users/kpboon/Personal Project/FIlesToolkit/modules/compress/android/.cxx/RelWithDebInfo/b1021f4f/armeabi-v7a" \
-  ftx264

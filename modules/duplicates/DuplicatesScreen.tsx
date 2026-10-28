@@ -22,10 +22,12 @@ import {
   usePalette,
   type Progress,
 } from '@/ui';
-import { bytes, duration } from '@/lib/format';
+import { errorMessage, isCancelled } from '@/lib/errors';
+import { bytes, duration, plural } from '@/lib/format';
 import { usePersistentState } from '@/lib/settings';
+import { toggled } from '@/lib/sets';
 import { useTaskLock } from '@/lib/tasks';
-import { MediaLibrary, isCancelled, trashName, useMediaScope } from '../media-library';
+import { MediaLibrary, trashName, useMediaScope } from '../media-library';
 import { Duplicates, type DupGroup, type DupMember } from './engine';
 import { DEFAULT_DUPE_SETTINGS, type DupeSettings } from './settings';
 
@@ -74,17 +76,11 @@ export default function DuplicatesScreen() {
         setPhase('results');
       } catch (e) {
         setPhase('setup');
-        if (!isCancelled(e)) Alert.alert('Scan failed', String((e as Error).message ?? e));
+        if (!isCancelled(e)) Alert.alert('Scan failed', errorMessage(e));
       }
     });
 
-  const toggle = (id: string) =>
-    setSelected((cur) => {
-      const next = new Set(cur);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+  const toggle = (id: string) => setSelected((cur) => toggled(cur, id));
 
   const selectedBytes = useMemo(
     () => groups.flatMap((g) => g.members).filter((m) => selected.has(m.id)).reduce((n, m) => n + m.size, 0),
@@ -105,9 +101,9 @@ export default function DuplicatesScreen() {
           .filter((g) => g.members.length >= 2),
       );
       setSelected(new Set());
-      Alert.alert('Done', `${ids.length} items moved to ${trashName()} · ${bytes(selectedBytes)} freed`);
+      Alert.alert('Done', `${plural(ids.length, 'item')} moved to ${trashName()} · ${bytes(selectedBytes)} freed`);
     } catch (e) {
-      Alert.alert('Delete failed', String((e as Error).message ?? e));
+      Alert.alert('Delete failed', errorMessage(e));
     } finally {
       setDeleting(false);
     }
@@ -115,7 +111,7 @@ export default function DuplicatesScreen() {
 
   const onDelete = () => {
     if (orphanGroups > 0) {
-      Alert.alert('No copy kept', `In ${orphanGroups} group(s) every copy is selected, so nothing from them will be kept.`, [
+      Alert.alert('No copy kept', `In ${plural(orphanGroups, 'group')} every copy is selected, so nothing from them will be kept.`, [
         { text: 'Cancel', style: 'cancel' },
         { text: 'Delete anyway', style: 'destructive', onPress: doDelete },
       ]);

@@ -11,3 +11,8 @@ export function cleanNameInput(text: string): string {
   }
   return kept;
 }
+
+/** Java's String.trim, as the native side trims names: strips characters up to U+0020 from both ends. */
+export function javaTrim(s: string): string {
+  return s.replace(/^[\u0000- ]+|[\u0000- ]+$/g, '');
+}

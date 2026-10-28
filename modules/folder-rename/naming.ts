@@ -1,3 +1,5 @@
+import { javaTrim } from '../folder-access/names.ts';
+
 /** What the default name format looks like: 1 video and 2 photos. */
 export const EXAMPLE_BASE = '1V2P';
 
@@ -74,9 +76,4 @@ export function isUnchanged(entry: PlannedFolder): boolean {
 
 export function willRename(entry: PlannedFolder): boolean {
   return entry.conflict == null && entry.name !== entry.target;
-}
-
-/** Java's String.trim: strips characters up to U+0020 from both ends. */
-function javaTrim(s: string): string {
-  return s.replace(/^[\u0000- ]+|[\u0000- ]+$/g, '');
 }

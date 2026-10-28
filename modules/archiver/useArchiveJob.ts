@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { isCancelled } from '../media-library';
+import { errorMessage, isCancelled } from '@/lib/errors';
 import type { Progress } from '@/ui';
 import { Archiver, isPasswordError } from './engine';
 
@@ -34,8 +34,8 @@ export function useArchiveJob() {
       const text = isCancelled(e)
         ? 'Stopped. Anything half-written was removed.'
         : isPasswordError(e)
-          ? String((e as Error).message ?? 'Wrong password.')
-          : `Couldn't finish: ${String((e as Error).message ?? e)}`;
+          ? errorMessage(e, 'Wrong password.')
+          : `Couldn't finish: ${errorMessage(e)}`;
       setOutcome({ text, tone: 'warn' });
     } finally {
       active.current = false;

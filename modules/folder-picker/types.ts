@@ -34,8 +34,3 @@ export interface FolderSource {
   /** Whether a selection covers every folder (then it is saved as "all folders"). */
   coversAll?(ids: string[], includeSubfolders: boolean): boolean;
 }
-
-/** True when `id` is inside the folder `ancestor`. */
-export function isWithin(id: string, ancestor: string): boolean {
-  return id.startsWith(`${ancestor}/`);
-}

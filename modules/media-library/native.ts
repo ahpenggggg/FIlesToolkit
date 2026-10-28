@@ -44,8 +44,3 @@ declare class FTMediaLibraryModule extends NativeModule {
 }
 
 export const MediaLibrary = requireNativeModule<FTMediaLibraryModule>('FTMediaLibrary');
-
-/** True when a native job was stopped with cancel() (its promise rejects with E_CANCELLED). */
-export function isCancelled(e: unknown): boolean {
-  return typeof e === 'object' && e !== null && (e as { code?: string }).code === 'E_CANCELLED';
-}

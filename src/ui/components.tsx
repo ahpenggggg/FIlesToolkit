@@ -427,6 +427,36 @@ export function TextField({ disabled, monospace, style, ...rest }: TextInputProp
   );
 }
 
+/** A password field with a Show / Hide button beside it. */
+export function PasswordField({
+  value,
+  onChangeText,
+  placeholder = 'Password',
+  disabled,
+}: {
+  value: string;
+  onChangeText: (text: string) => void;
+  placeholder?: string;
+  disabled?: boolean;
+}) {
+  const [shown, setShown] = useState(false);
+  return (
+    <View style={styles.fieldRow}>
+      <TextField
+        value={value}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
+        secureTextEntry={!shown}
+        autoCapitalize="none"
+        autoCorrect={false}
+        disabled={disabled}
+        style={{ flex: 1 }}
+      />
+      <Button label={shown ? 'Hide' : 'Show'} variant="ghost" size="sm" onPress={() => setShown((s) => !s)} />
+    </View>
+  );
+}
+
 /** A search box with a clear button; `note` sits at its end, e.g. "12 of 340". */
 export function SearchField({
   value,
@@ -628,6 +658,7 @@ const styles = StyleSheet.create({
   },
   searchInput: { flex: 1, fontSize: 15, paddingVertical: 0 },
   field: { borderWidth: 1, borderRadius: radius.md, paddingHorizontal: 14, paddingVertical: Platform.OS === 'ios' ? 13 : 10, fontSize: 15 },
+  fieldRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   pill: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 9, paddingVertical: 5, borderRadius: radius.pill },
   notice: { flexDirection: 'row', gap: 10, alignItems: 'flex-start', padding: 14, borderRadius: radius.md, borderWidth: StyleSheet.hairlineWidth },
   track: { height: 6, borderRadius: 3, overflow: 'hidden', flex: 1 },

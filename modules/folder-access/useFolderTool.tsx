@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, Platform } from 'react-native';
+import { errorMessage } from '@/lib/errors';
 import { usePersistentState } from '@/lib/settings';
 import { isBlocked, useBlockingTool, useTaskLock } from '@/lib/tasks';
 import type { ToolKey } from '@/tools';
 import type { Progress } from '@/ui';
 import { FolderPickerSheet, FolderScopeCard, type FolderSource } from '../folder-picker';
 import { FolderAccess, READ_FAILED, ensureAllFilesAccess, type RenameRequest } from './native';
+import { baseName } from './paths';
 import { createStorageFolderSource, storagePathLabel } from './storageSource';
 
 /** The chosen folder, remembered between launches but only read when the user asks. */
@@ -103,7 +105,7 @@ export function useFolderTool<T extends { rootName: string }>(options: Options<T
   /** A new folder replaces the old one and its results; it is read when the user taps Scan. */
   const pick = (uri: string) => {
     setPicker(null);
-    setFolder({ uri, name: Platform.OS === 'android' ? uri.slice(uri.lastIndexOf('/') + 1) : null });
+    setFolder({ uri, name: Platform.OS === 'android' ? baseName(uri) : null });
     setData(null);
     setAttempted(false);
     setMessage(null);
@@ -114,7 +116,7 @@ export function useFolderTool<T extends { rootName: string }>(options: Options<T
       // iOS has no shared storage to browse: use the Files folder picker.
       FolderAccess.pickFolder()
         .then((picked) => picked && pick(picked.uri))
-        .catch((e) => Alert.alert('Folder access', String((e as Error).message ?? e)));
+        .catch((e) => Alert.alert('Folder access', errorMessage(e)));
       return;
     }
     if (ensureAllFilesAccess()) setPicker(createStorageFolderSource({ protect: true }));

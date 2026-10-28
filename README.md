@@ -49,7 +49,8 @@ src/shell/               PermissionGate.tsx (launch permission check)
 src/ui/                  Design system: theme.ts (brand colours, type), components.tsx (ToolScreen and
                          every shared control), Sheet.tsx (the full-screen sheet behind every picker),
                          FastList.tsx (FlashList with fast scroller and back-to-top button)
-src/lib/                 settings.ts (persisted state, AsyncStorage), lastTool.ts, format.ts
+src/lib/                 settings.ts (persisted state, AsyncStorage), tasks.ts (one task at a time), lastTool.ts,
+                         format.ts (sizes, plurals), errors.ts (native error codes), sets.ts
 modules/
   duplicates/            Duplicates
     DuplicatesScreen.tsx, settings.ts, engine.ts (typed native API)
@@ -81,6 +82,7 @@ modules/
     permissions.ts, android/ ios/ (folder tree / albums, Trash, item registry)
   folder-access/         shared by Folder names, File names and Archives
     storageSource.ts     device storage as a FolderSource (folders, optionally files; protected folders)
+    names.ts, paths.ts   name rules shared by the rename tools and Archives; path helpers
     useFolderTool.tsx    chosen folder, scan on request, progress, picker, two-phase rename
     android/ ios/        list folders and files, rename (Android: All files access; iOS: Files bookmark)
 plugins/withReleaseSigning.js  local Android release signing (no EAS)
@@ -235,7 +237,7 @@ FILETOOLKIT_KEY_PASSWORD=...
 ```bash
 npm run typecheck
 npm run lint
-npm test               # file-grouping, folder-naming and name-input rules
+npm test               # every *.test.ts under src/ and modules/ (needs Node 22.6+ for type stripping)
 ```
 
 ## Platform notes

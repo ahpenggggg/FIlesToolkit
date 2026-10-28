@@ -1,5 +1,7 @@
 import { memo, useCallback, useDeferredValue, useMemo, useState } from 'react';
 import { Alert, Keyboard, Pressable, StyleSheet, View } from 'react-native';
+import { plural } from '@/lib/format';
+import { toggled } from '@/lib/sets';
 import { usePersistentState } from '@/lib/settings';
 import {
   ActionButton,
@@ -79,31 +81,19 @@ export default function FileRenameScreen() {
 
   // Stable callbacks, so rows that didn't change skip re-rendering.
   const updateGroup = useCallback(
-    (index: number, change: Partial<FileGroup>) =>
-      setData((d) => (d ? { ...d, groups: d.groups.map((g, i) => (i === index ? { ...g, ...change } : g)) } : d)),
+    (index: number, change: (g: FileGroup) => Partial<FileGroup>) =>
+      setData((d) => (d ? { ...d, groups: d.groups.map((g, i) => (i === index ? { ...g, ...change(g) } : g)) } : d)),
     [setData],
   );
-  const nameGroup = useCallback((index: number, name: string) => updateGroup(index, { name }), [updateGroup]);
-  const toggleExpanded = useCallback(
-    (index: number) => setData((d) => (d ? { ...d, groups: d.groups.map((g, i) => (i === index ? { ...g, expanded: !g.expanded } : g)) } : d)),
-    [setData],
-  );
-  const toggleCollapsed = useCallback(
-    (index: number) => setData((d) => (d ? { ...d, groups: d.groups.map((g, i) => (i === index ? { ...g, collapsed: !g.collapsed } : g)) } : d)),
-    [setData],
-  );
+  const nameGroup = useCallback((index: number, name: string) => updateGroup(index, () => ({ name })), [updateGroup]);
+  const toggleExpanded = useCallback((index: number) => updateGroup(index, (g) => ({ expanded: !g.expanded })), [updateGroup]);
+  const toggleCollapsed = useCallback((index: number) => updateGroup(index, (g) => ({ collapsed: !g.collapsed })), [updateGroup]);
 
   const busy = tool.busy;
   const toggleFile = useCallback(
     (uri: string) => {
       if (busy) return;
-      setData((d) => {
-        if (!d) return d;
-        const excluded = new Set(d.excluded);
-        if (excluded.has(uri)) excluded.delete(uri);
-        else excluded.add(uri);
-        return { ...d, excluded };
-      });
+      setData((d) => (d ? { ...d, excluded: toggled(d.excluded, uri) } : d));
     },
     [busy, setData],
   );
@@ -120,7 +110,7 @@ export default function FileRenameScreen() {
     if (pending.length === 0) return;
     const count = pending.length;
     Alert.alert(
-      `Rename ${count}${count === 1 ? ' file?' : ' files?'}`,
+      `Rename ${plural(count, 'file')}?`,
       `Files in each named group will be numbered with their group name, keeping their extensions (e.g. ${pending[0].file.name} → ${pending[0].target}). Unnamed groups and left-out files stay as they are.`,
       [
         { text: 'Cancel', style: 'cancel' },
@@ -159,7 +149,7 @@ export default function FileRenameScreen() {
       action =
         renameable === 0
           ? { label: 'Name a group to rename', disabled: true }
-          : { label: `Rename ${renameable}${renameable === 1 ? ' file' : ' files'}`, icon: 'rename-box', onPress: confirmRename };
+          : { label: `Rename ${plural(renameable, 'file')}`, icon: 'rename-box', onPress: confirmRename };
     }
   }
 
@@ -320,7 +310,7 @@ const GroupHead = memo(function GroupHead({
   onCollapse: (index: number) => void;
 }) {
   const c = usePalette();
-  const count = total === 1 ? '1 file' : `${total} files`;
+  const count = plural(total, 'file');
   const label = searching ? `${matching} of ${count} match` : count;
   const placeholder = other ? 'Name these files' : suggestion === '' ? 'Name this group' : `e.g. ${suggestion}`;
   return (

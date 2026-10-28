@@ -1,4 +1,5 @@
 import { NativeModule, requireOptionalNativeModule } from 'expo';
+import { hasErrorCode } from '@/lib/errors';
 
 /** Native archiver (Android): ZIP via zip4j; RAR, 7Z and others via libarchive. */
 
@@ -76,5 +77,5 @@ export const Archiver = requireOptionalNativeModule<FTArchiverModule>('FTArchive
 
 /** A wrong or missing password (the promise rejected with E_PASSWORD). */
 export function isPasswordError(e: unknown): boolean {
-  return typeof e === 'object' && e !== null && (e as { code?: string }).code === 'E_PASSWORD';
+  return hasErrorCode(e, 'E_PASSWORD');
 }

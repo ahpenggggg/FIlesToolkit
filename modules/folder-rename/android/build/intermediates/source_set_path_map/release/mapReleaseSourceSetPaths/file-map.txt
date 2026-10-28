@@ -1,8 +1,0 @@
-expo.modules.filetoolkit.folderrename.filetoolkit-folder-rename-release-0 /Users/kpboon/PersonalProject/FIlesToolkit/modules/folder-access/android/build/intermediates/packaged_res/release/packageReleaseResources
-expo.modules.filetoolkit.folderrename.filetoolkit-folder-rename-pngs-1 /Users/kpboon/PersonalProject/FIlesToolkit/modules/folder-rename/android/build/generated/res/pngs/release
-expo.modules.filetoolkit.folderrename.filetoolkit-folder-rename-resValues-2 /Users/kpboon/PersonalProject/FIlesToolkit/modules/folder-rename/android/build/generated/res/resValues/release
-expo.modules.filetoolkit.folderrename.filetoolkit-folder-rename-mergeReleaseResources-3 /Users/kpboon/PersonalProject/FIlesToolkit/modules/folder-rename/android/build/intermediates/incremental/release/mergeReleaseResources/merged.dir
-expo.modules.filetoolkit.folderrename.filetoolkit-folder-rename-mergeReleaseResources-4 /Users/kpboon/PersonalProject/FIlesToolkit/modules/folder-rename/android/build/intermediates/incremental/release/mergeReleaseResources/stripped.dir
-expo.modules.filetoolkit.folderrename.filetoolkit-folder-rename-release-5 /Users/kpboon/PersonalProject/FIlesToolkit/modules/folder-rename/android/build/intermediates/merged_res/release/mergeReleaseResources
-expo.modules.filetoolkit.folderrename.filetoolkit-folder-rename-main-6 /Users/kpboon/PersonalProject/FIlesToolkit/modules/folder-rename/android/src/main/res
-expo.modules.filetoolkit.folderrename.filetoolkit-folder-rename-release-7 /Users/kpboon/PersonalProject/FIlesToolkit/modules/folder-rename/android/src/release/res

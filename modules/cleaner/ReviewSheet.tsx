@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { bytes } from '@/lib/format';
+import { errorMessage } from '@/lib/errors';
+import { bytes, plural } from '@/lib/format';
 import { Button, Card, Divider, FastList, Icon, IconTile, Notice, SectionLabel, Sheet, Txt, usePalette } from '@/ui';
-import { storagePathLabel } from '../folder-access';
+import { baseName, parentOf, storagePathLabel } from '../folder-access';
 import { Cleaner, type CleanItem, type FolderContents } from './engine';
 import { displayName, kindInfo } from './model';
 
@@ -21,16 +22,15 @@ export function ReviewSheet({ item, onClose, onSelect }: { item: CleanItem; onCl
     Cleaner!
       .contents(item.path)
       .then((r) => live && setContents(r))
-      .catch((e) => live && setError(String((e as Error).message ?? e)));
+      .catch((e) => live && setError(errorMessage(e)));
     return () => {
       live = false;
     };
   }, [item]);
 
-  const open = () => Cleaner!.open(item.path).catch((e) => setError(String((e as Error).message ?? e)));
+  const open = () => Cleaner!.open(item.path).catch((e) => setError(errorMessage(e)));
 
   const kind = kindInfo(item.kind);
-  const parent = item.path.slice(0, item.path.lastIndexOf('/'));
   const header = (
     <View style={styles.header}>
       <Card style={{ gap: 12 }}>
@@ -41,14 +41,14 @@ export function ReviewSheet({ item, onClose, onSelect }: { item: CleanItem; onCl
               {displayName(item)}
             </Txt>
             <Txt v="caption" color={c.muted} numberOfLines={2}>
-              {storagePathLabel(parent)}
+              {storagePathLabel(parentOf(item.path))}
             </Txt>
           </View>
         </View>
         <Divider />
         <Txt v="bodyStrong">
           {bytes(item.size)}
-          {item.isDirectory ? ` · ${item.files} ${item.files === 1 ? 'file' : 'files'}` : ''}
+          {item.isDirectory ? ` · ${plural(item.files, 'file')}` : ''}
           {` · changed ${new Date(item.modified).toLocaleDateString()}`}
         </Txt>
         <Txt v="small" color={c.muted}>
@@ -80,7 +80,7 @@ export function ReviewSheet({ item, onClose, onSelect }: { item: CleanItem; onCl
         ListHeaderComponent={header}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }}
         ItemSeparatorComponent={Divider}
-        labelFor={(f) => f.name.slice(f.name.lastIndexOf('/') + 1)}
+        labelFor={(f) => baseName(f.name)}
         renderItem={({ item: f }) => (
           <View style={styles.entry}>
             <Icon name="file-outline" size={18} color={c.muted} />

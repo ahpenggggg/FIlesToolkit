@@ -1,6 +1,8 @@
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, Pressable, StyleSheet, View } from 'react-native';
-import { bytes } from '@/lib/format';
+import { errorMessage, isCancelled } from '@/lib/errors';
+import { bytes, plural } from '@/lib/format';
+import { toggled } from '@/lib/sets';
 import { usePersistentState } from '@/lib/settings';
 import { useTaskLock } from '@/lib/tasks';
 import {
@@ -25,8 +27,7 @@ import {
   usePalette,
   type Progress,
 } from '@/ui';
-import { ensureAllFilesAccess, storagePathLabel } from '../folder-access';
-import { isCancelled } from '../media-library';
+import { ensureAllFilesAccess, parentOf, storagePathLabel } from '../folder-access';
 import { Cleaner, type CleanItem, type CleanKind } from './engine';
 import { KINDS, defaultSelection, displayName, needsReview, resultRows, type ResultRow } from './model';
 import { ReviewSheet } from './ReviewSheet';
@@ -63,7 +64,7 @@ export default function CleanerScreen() {
       setPhase('results');
     } catch (e) {
       setPhase('setup');
-      if (!isCancelled(e)) Alert.alert('Scan failed', String((e as Error).message ?? e));
+      if (!isCancelled(e)) Alert.alert('Scan failed', errorMessage(e));
     }
   };
 
@@ -85,12 +86,7 @@ export default function CleanerScreen() {
         setReviewing(item);
         return;
       }
-      setSelected((cur) => {
-        const next = new Set(cur);
-        if (next.has(item.path)) next.delete(item.path);
-        else next.add(item.path);
-        return next;
-      });
+      setSelected((cur) => toggled(cur, item.path));
     },
     [cleaning, selectable],
   );
@@ -124,7 +120,7 @@ export default function CleanerScreen() {
       Alert.alert('Done', `${result.cleaned.length} cleaned · ${bytes(result.freed)} freed${failed}`);
     } catch (e) {
       if (isCancelled(e)) Alert.alert('Stopped', 'What was already deleted stays deleted. Scan again to see what is left.');
-      else Alert.alert('Clean failed', String((e as Error).message ?? e));
+      else Alert.alert('Clean failed', errorMessage(e));
     } finally {
       setCleaning(false);
     }
@@ -133,7 +129,7 @@ export default function CleanerScreen() {
   const confirmClean = () => {
     const big = chosen.filter(needsReview).length;
     Alert.alert(
-      `Delete ${chosen.length} ${chosen.length === 1 ? 'item' : 'items'} for good?`,
+      `Delete ${plural(chosen.length, 'item')} for good?`,
       `This frees ${bytes(chosenBytes)}. Cleaned items are deleted, not moved to Trash, and can't be brought back.${
         big > 0 ? ` This includes ${big} over 50 MB that you checked.` : ''
       }`,
@@ -199,7 +195,7 @@ export default function CleanerScreen() {
               />
               {cleaning ? <ProgressCard progress={progress} onCancel={() => Cleaner!.cancel()} /> : null}
               {toCheck > 0 ? (
-                <Notice tone="warn" message={`${toCheck} ${toCheck === 1 ? 'item is' : 'items are'} over 50 MB and not selected. Tap one to check what's inside first.`} />
+                <Notice tone="warn" message={`${plural(toCheck, 'item is', 'items are')} over 50 MB and not selected. Tap one to check what's inside first.`} />
               ) : null}
               <View style={styles.toolbar}>
                 <Button
@@ -322,8 +318,7 @@ const ItemRow = memo(function ItemRow({
   onReview: (item: CleanItem) => void;
 }) {
   const c = usePalette();
-  const parent = item.path.slice(0, item.path.lastIndexOf('/'));
-  const detail = item.isDirectory ? (item.files > 0 ? `${bytes(item.size)} · ${item.files} ${item.files === 1 ? 'file' : 'files'}` : 'Empty') : bytes(item.size);
+  const detail = item.isDirectory ? (item.files > 0 ? `${bytes(item.size)} · ${plural(item.files, 'file')}` : 'Empty') : bytes(item.size);
   return (
     <Pressable
       onPress={() => onPress(item)}
@@ -335,7 +330,7 @@ const ItemRow = memo(function ItemRow({
           {displayName(item)}
         </Txt>
         <Txt v="caption" color={c.muted} numberOfLines={1} ellipsizeMode="head">
-          {storagePathLabel(parent)}
+          {storagePathLabel(parentOf(item.path))}
         </Txt>
         <Txt v="caption" color={c.muted}>
           {detail}

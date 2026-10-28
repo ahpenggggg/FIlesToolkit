@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { bytes } from '@/lib/format';
-import { Button, Card, Divider, SectionLabel, Segmented, TextField, ToggleRow, Txt, usePalette, type Action } from '@/ui';
-import { cleanNameInput, createStorageFolderSource, ensureAllFilesAccess, storagePathLabel } from '../folder-access';
+import { bytes, listSummary } from '@/lib/format';
+import { Card, Divider, PasswordField, SectionLabel, Segmented, TextField, ToggleRow, Txt, usePalette, type Action } from '@/ui';
+import { baseName, cleanNameInput, createStorageFolderSource, ensureAllFilesAccess, parentOf, storagePathLabel } from '../folder-access';
 import { FolderPickerSheet, FolderScopeCard, type FolderSource } from '../folder-picker';
 import { Archiver } from './engine';
-import { SPLIT_PRESETS, defaultZipName, parentOf, splitBytes } from './naming';
+import { SPLIT_PRESETS, defaultZipName, splitBytes } from './naming';
 import type { ArchiverSettings } from './settings';
 import type { ArchiveJob } from './useArchiveJob';
 
@@ -24,7 +24,6 @@ export function useCreateZip(settings: ArchiverSettings, setSettings: (change: P
   const [name, setName] = useState('');
   const [passwordOn, setPasswordOn] = useState(false);
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   /** Which picker is open: the items, or where to save. */
   const [picker, setPicker] = useState<{ kind: 'items' | 'folder'; source: FolderSource } | null>(null);
 
@@ -76,13 +75,7 @@ export function useCreateZip(settings: ArchiverSettings, setSettings: (change: P
               ? { label: 'Enter a part size', disabled: true }
               : { label: 'Create ZIP', icon: 'zip-box-outline', onPress: create };
 
-  const itemNames = items.map((p) => p.slice(p.lastIndexOf('/') + 1));
-  const summary =
-    items.length === 0
-      ? 'Nothing chosen'
-      : itemNames.length <= 2
-        ? itemNames.join(', ')
-        : `${itemNames.slice(0, 2).join(', ')} +${itemNames.length - 2} more`;
+  const summary = items.length === 0 ? 'Nothing chosen' : listSummary(items.map(baseName));
 
   const content = (
     <>
@@ -147,21 +140,7 @@ export function useCreateZip(settings: ArchiverSettings, setSettings: (change: P
           onChange={setPasswordOn}
           disabled={job.running}
         />
-        {passwordOn ? (
-          <View style={styles.nameRow}>
-            <TextField
-              value={password}
-              onChangeText={setPassword}
-              placeholder="Password"
-              secureTextEntry={!showPassword}
-              autoCapitalize="none"
-              autoCorrect={false}
-              disabled={job.running}
-              style={{ flex: 1 }}
-            />
-            <Button label={showPassword ? 'Hide' : 'Show'} variant="ghost" size="sm" onPress={() => setShowPassword((s) => !s)} />
-          </View>
-        ) : null}
+        {passwordOn ? <PasswordField value={password} onChangeText={setPassword} disabled={job.running} /> : null}
         <Divider />
         <ToggleRow
           label="Split into parts"

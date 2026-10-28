@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { bytes } from '@/lib/format';
-import { Button, Card, Divider, FastList, Icon, Notice, SectionLabel, Segmented, Sheet, TextField, Txt, usePalette, type Action } from '@/ui';
-import { createStorageFolderSource, ensureAllFilesAccess, storagePathLabel } from '../folder-access';
+import { errorMessage } from '@/lib/errors';
+import { bytes, plural } from '@/lib/format';
+import { Card, Divider, FastList, Icon, Notice, PasswordField, SectionLabel, Segmented, Sheet, Txt, usePalette, type Action } from '@/ui';
+import { baseName, createStorageFolderSource, ensureAllFilesAccess, parentOf, storagePathLabel } from '../folder-access';
 import { FolderPickerSheet, FolderScopeCard, type FolderSource } from '../folder-picker';
 import { Archiver, isPasswordError, type ArchiveInfo, type ArchiveItem } from './engine';
-import { archiveBaseName, isArchiveName, parentOf } from './naming';
+import { archiveBaseName, isArchiveName } from './naming';
 import type { ArchiverSettings } from './settings';
 import type { ArchiveJob } from './useArchiveJob';
 
@@ -19,7 +20,6 @@ export function useExtractArchive(settings: ArchiverSettings, setSettings: (chan
   const [reading, setReading] = useState(false);
   const [readError, setReadError] = useState<string | null>(null);
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   /** Where to extract; defaults to the archive's folder. */
   const [base, setBase] = useState<string | null>(null);
   /** The sheet listing every file in the archive. */
@@ -38,7 +38,7 @@ export function useExtractArchive(settings: ArchiverSettings, setSettings: (chan
       setInfo(await Archiver!.inspect(path, pwd));
     } catch (e) {
       setInfo(null);
-      setReadError(isPasswordError(e) ? 'Wrong password.' : `Couldn't read this archive: ${String((e as Error).message ?? e)}`);
+      setReadError(isPasswordError(e) ? 'Wrong password.' : `Couldn't read this archive: ${errorMessage(e)}`);
     } finally {
       setReading(false);
     }
@@ -54,7 +54,7 @@ export function useExtractArchive(settings: ArchiverSettings, setSettings: (chan
     read(path, '');
   };
 
-  const archiveName = archive ? archive.slice(archive.lastIndexOf('/') + 1) : '';
+  const archiveName = archive ? baseName(archive) : '';
   const folderName = archiveBaseName(archiveName);
   const destination = base ? (settings.extractInto === 'folder' ? `${base}/${folderName}` : base) : null;
   const locked = info?.needsPassword ?? false;
@@ -71,7 +71,7 @@ export function useExtractArchive(settings: ArchiverSettings, setSettings: (chan
           conflict: settings.conflict,
         }),
       (r) =>
-        `Extracted ${r.extracted} file${r.extracted === 1 ? '' : 's'} to ${storagePathLabel(r.destination)}` +
+        `Extracted ${plural(r.extracted, 'file')} to ${storagePathLabel(r.destination)}` +
         (r.skipped > 0 ? ` · ${r.skipped} skipped (already there)` : '') +
         '.',
     );
@@ -104,7 +104,7 @@ export function useExtractArchive(settings: ArchiverSettings, setSettings: (chan
           reading
             ? 'Reading…'
             : info && !locked
-              ? `${info.format} · ${info.fileCount} file${info.fileCount === 1 ? '' : 's'} · ${bytes(info.totalSize)}${info.parts > 1 ? ` · ${info.parts} parts` : ''}${info.encrypted ? ' · password protected' : ''}`
+              ? `${info.format} · ${plural(info.fileCount, 'file')} · ${bytes(info.totalSize)}${info.parts > 1 ? ` · ${info.parts} parts` : ''}${info.encrypted ? ' · password protected' : ''}`
               : locked
                 ? `${info!.format} · password protected, contents hidden`
                 : ''
@@ -119,19 +119,7 @@ export function useExtractArchive(settings: ArchiverSettings, setSettings: (chan
       {archive && (locked || info?.encrypted || isPasswordReadError(readError)) ? (
         <Card>
           <SectionLabel>Password</SectionLabel>
-          <View style={styles.row}>
-            <TextField
-              value={password}
-              onChangeText={setPassword}
-              placeholder="Archive password"
-              secureTextEntry={!showPassword}
-              autoCapitalize="none"
-              autoCorrect={false}
-              disabled={job.running}
-              style={{ flex: 1 }}
-            />
-            <Button label={showPassword ? 'Hide' : 'Show'} variant="ghost" size="sm" onPress={() => setShowPassword((s) => !s)} />
-          </View>
+          <PasswordField value={password} onChangeText={setPassword} placeholder="Archive password" disabled={job.running} />
           <Txt v="caption" color={c.muted}>
             {locked ? 'Even the file names are encrypted. Enter the password and tap Unlock.' : 'Needed to extract the encrypted files.'}
           </Txt>
@@ -172,7 +160,7 @@ export function useExtractArchive(settings: ArchiverSettings, setSettings: (chan
             contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }}
             ItemSeparatorComponent={Divider}
             backToTop
-            labelFor={(f) => f.name.slice(f.name.lastIndexOf('/') + 1)}
+            labelFor={(f) => baseName(f.name)}
             ListFooterComponent={
               info.fileCount > files.length ? (
                 <Txt v="caption" color={c.muted} style={{ paddingVertical: 12 }}>

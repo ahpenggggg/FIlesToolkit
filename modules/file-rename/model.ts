@@ -1,3 +1,4 @@
+import { javaTrim } from '../folder-access/names.ts';
 import { assignTargets, extensionOf, group, naturalCompare, stemOf, suggestionFor, takePatternless } from './grouping.ts';
 
 /** With "Gather small groups" on, groups smaller than this go to Other files. */
@@ -86,11 +87,6 @@ export function regroup(scan: FileScan, previousGroups: FileGroup[], strictMatch
 export function cleanGroupName(name: string): string {
   // Trailing dots and spaces are dropped by many file systems, so leave them off.
   return javaTrim(name).replace(/[. \t\n\x0B\f\r]+$/, '');
-}
-
-/** Java's String.trim: strips characters up to U+0020 from both ends. */
-export function javaTrim(s: string): string {
-  return s.replace(/^[\u0000- ]+|[\u0000- ]+$/g, '');
 }
 
 export interface PlannedRename {

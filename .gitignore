@@ -39,3 +39,50 @@ yarn-error.*
 # Generated native projects (Continuous Native Generation)
 /android
 /ios
+
+# Native build output of the local Expo modules (Gradle / CMake)
+modules/*/android/build/
+modules/*/android/.cxx/
+.gradle/
+.cxx/
+local.properties
+captures/
+*.keystore
+!debug.keystore
+*.apk
+*.aab
+
+# Xcode / CocoaPods
+xcuserdata/
+DerivedData/
+*.xcuserstate
+Pods/
+
+# Release signing secrets (see README: they live in ~/.gradle/gradle.properties)
+gradle.properties.local
+
+# Env files (keep an example committed if one is added)
+.env
+.env.*
+!.env.example
+
+# Logs and caches
+*.log
+logs/
+.eslintcache
+.cache/
+coverage/
+
+# Editors and OS
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+*~
+Thumbs.db
+
+# Local AI assistant settings
+.claude/settings.local.json
+CLAUDE.local.md

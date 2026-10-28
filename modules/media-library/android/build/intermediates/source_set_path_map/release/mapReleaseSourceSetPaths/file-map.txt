@@ -1,7 +1,0 @@
-expo.modules.filetoolkit.medialibrary.filetoolkit-media-library-pngs-0 /Users/kpboon/PersonalProject/FIlesToolkit/modules/media-library/android/build/generated/res/pngs/release
-expo.modules.filetoolkit.medialibrary.filetoolkit-media-library-resValues-1 /Users/kpboon/PersonalProject/FIlesToolkit/modules/media-library/android/build/generated/res/resValues/release
-expo.modules.filetoolkit.medialibrary.filetoolkit-media-library-mergeReleaseResources-2 /Users/kpboon/PersonalProject/FIlesToolkit/modules/media-library/android/build/intermediates/incremental/release/mergeReleaseResources/merged.dir
-expo.modules.filetoolkit.medialibrary.filetoolkit-media-library-mergeReleaseResources-3 /Users/kpboon/PersonalProject/FIlesToolkit/modules/media-library/android/build/intermediates/incremental/release/mergeReleaseResources/stripped.dir
-expo.modules.filetoolkit.medialibrary.filetoolkit-media-library-release-4 /Users/kpboon/PersonalProject/FIlesToolkit/modules/media-library/android/build/intermediates/merged_res/release/mergeReleaseResources
-expo.modules.filetoolkit.medialibrary.filetoolkit-media-library-main-5 /Users/kpboon/PersonalProject/FIlesToolkit/modules/media-library/android/src/main/res
-expo.modules.filetoolkit.medialibrary.filetoolkit-media-library-release-6 /Users/kpboon/PersonalProject/FIlesToolkit/modules/media-library/android/src/release/res

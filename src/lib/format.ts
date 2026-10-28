@@ -17,3 +17,13 @@ export function duration(ms: number): string | null {
 export function percentSaved(before: number, after: number): number {
   return before > 0 ? Math.round((1 - after / before) * 100) : 0;
 }
+
+/** "1 file", "3 files"; `many` for irregular words, e.g. plural(n, 'folder has', 'folders have'). */
+export function plural(n: number, one: string, many = `${one}s`): string {
+  return `${n} ${n === 1 ? one : many}`;
+}
+
+/** The first `shown` names, then how many more: "a, b +3 more". */
+export function listSummary(names: string[], shown = 2): string {
+  return names.length <= shown ? names.join(', ') : `${names.slice(0, shown).join(', ')} +${names.length - shown} more`;
+}

@@ -13,3 +13,4 @@ export {
 export { createStorageFolderSource, storagePathLabel } from './storageSource';
 export { useFolderTool } from './useFolderTool';
 export { INVALID_NAME_CHARS, cleanNameInput } from './names';
+export { baseName, parentOf } from './paths';

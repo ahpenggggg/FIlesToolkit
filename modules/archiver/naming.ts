@@ -1,3 +1,5 @@
+import { baseName, parentOf } from '../folder-access/paths.ts';
+
 /**
  * Files the Extract picker offers: archives, but of a split set only the first part
  * (name.part1.rar; name.zip.001 / name.rar.001 / name.7z.001 as cut by 7-Zip and other splitters).
@@ -21,18 +23,11 @@ export function archiveBaseName(name: string): string {
 export function defaultZipName(items: string[]): string {
   if (items.length === 0) return '';
   if (items.length === 1) {
-    const name = items[0].slice(items[0].lastIndexOf('/') + 1);
+    const name = baseName(items[0]);
     const dot = name.lastIndexOf('.');
     return dot > 0 ? name.slice(0, dot) : name;
   }
-  const parent = items[0].slice(0, items[0].lastIndexOf('/'));
-  const folder = parent.slice(parent.lastIndexOf('/') + 1);
-  return folder || 'Archive';
-}
-
-/** The folder an item sits in. */
-export function parentOf(path: string): string {
-  return path.slice(0, path.lastIndexOf('/'));
+  return baseName(parentOf(items[0])) || 'Archive';
 }
 
 export const SPLIT_PRESETS = [

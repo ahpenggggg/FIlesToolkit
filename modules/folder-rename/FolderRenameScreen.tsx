@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { Alert, Keyboard, StyleSheet, View } from 'react-native';
+import { plural } from '@/lib/format';
 import { usePersistentState } from '@/lib/settings';
 import { ActionButton, Button, Card, FastList, Hero, Icon, Notice, Pill, ProgressCard, SectionLabel, StatRow, TextField, ToolScreen, Txt, mono, radius, usePalette, type Action } from '@/ui';
 import { cleanNameInput, useFolderTool } from '../folder-access';
@@ -48,7 +49,7 @@ export default function FolderRenameScreen() {
         ? `its video and photo count (e.g. ${EXAMPLE_BASE})`
         : `its video and photo count with the prefix ${prefix} (e.g. ${withPrefix(prefix, EXAMPLE_BASE)})`;
     Alert.alert(
-      `Rename ${count}${count === 1 ? ' folder?' : ' folders?'}`,
+      `Rename ${plural(count, 'folder')}?`,
       `Each child folder will be renamed to ${format}. Folders with duplicate target names or name conflicts will be skipped.`,
       [
         { text: 'Cancel', style: 'cancel' },
@@ -77,12 +78,12 @@ export default function FolderRenameScreen() {
     } else if (tool.message) {
       notice = { text: tool.message, warn: false };
     } else if (conflicts > 0) {
-      notice = { text: `${conflicts}${conflicts === 1 ? ' folder has' : ' folders have'} a name conflict and will be left unchanged.`, warn: true };
+      notice = { text: `${plural(conflicts, 'folder has', 'folders have')} a name conflict and will be left unchanged.`, warn: true };
     }
     action =
       renameable === 0
         ? { label: 'Nothing to rename', disabled: true }
-        : { label: `Rename ${renameable}${renameable === 1 ? ' folder' : ' folders'}`, icon: 'rename-box', onPress: confirmRename };
+        : { label: `Rename ${plural(renameable, 'folder')}`, icon: 'rename-box', onPress: confirmRename };
   }
   const showList = !tool.busy && planned != null;
 
@@ -188,12 +189,12 @@ function EntryRow({ entry }: { entry: PlannedFolder }) {
       <View style={styles.mediaRow}>
         <Icon name="video-outline" size={15} color={c.muted} />
         <Txt v="caption" color={c.muted}>
-          {entry.videos + (entry.videos === 1 ? ' video' : ' videos')}
+          {plural(entry.videos, 'video')}
         </Txt>
         <View style={{ width: 8 }} />
         <Icon name="image-outline" size={15} color={c.muted} />
         <Txt v="caption" color={c.muted}>
-          {entry.photos + (entry.photos === 1 ? ' photo' : ' photos')}
+          {plural(entry.photos, 'photo')}
         </Txt>
       </View>
       {conflict ? (

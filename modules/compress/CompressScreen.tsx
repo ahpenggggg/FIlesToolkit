@@ -21,10 +21,12 @@ import {
   usePalette,
   type Action,
 } from '@/ui';
-import { bytes, duration, percentSaved } from '@/lib/format';
+import { errorMessage, isCancelled } from '@/lib/errors';
+import { bytes, duration, percentSaved, plural } from '@/lib/format';
 import { usePersistentState } from '@/lib/settings';
+import { toggled } from '@/lib/sets';
 import { useTaskLock } from '@/lib/tasks';
-import { MediaLibrary, isCancelled, trashName, useMediaScope } from '../media-library';
+import { MediaLibrary, trashName, useMediaScope } from '../media-library';
 import { Compressor, type VideoAsset } from './engine';
 import { AUTO_MIN_VIDEO_BYTES, HANDBRAKE, outputSize, skipReason } from './plan';
 import { DEFAULT_COMPRESS_SETTINGS, type CompressSettings } from './settings';
@@ -59,7 +61,6 @@ export default function CompressScreen() {
   }, [videos]);
 
   const selected = useMemo(() => new Set([...picked].filter((id) => skips.get(id) == null)), [picked, skips]);
-  const setSelected = setPicked;
 
   const scope = useMediaScope({
     kind: 'video',
@@ -91,7 +92,7 @@ export default function CompressScreen() {
       try {
         setVideos(await Compressor.listVideos({ folderIds, includeSubfolders, minSize: AUTO_MIN_VIDEO_BYTES }));
       } catch (e) {
-        Alert.alert('Could not read videos', String((e as Error).message ?? e));
+        Alert.alert('Could not read videos', errorMessage(e));
         setVideos([]);
       }
     });
@@ -105,12 +106,7 @@ export default function CompressScreen() {
 
   const toggle = (id: string) => {
     if (phase !== 'browse' || skips.get(id)) return;
-    setSelected((cur) => {
-      const next = new Set(cur);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    setPicked((cur) => toggled(cur, id));
   };
 
   const compressible = (videos ?? []).filter((v) => skips.get(v.id) == null);
@@ -131,7 +127,7 @@ export default function CompressScreen() {
       await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS).catch(() => {});
     }
     await activateKeepAwakeAsync(KEEP_AWAKE_TAG).catch(() => {});
-    Compressor.beginSession(`${chosen.length} video${chosen.length === 1 ? '' : 's'} queued`);
+    Compressor.beginSession(`${plural(chosen.length, 'video')} queued`);
     const results: Record<string, JobStatus> = {};
     try {
       for (const [i, v] of chosen.entries()) {
@@ -152,7 +148,7 @@ export default function CompressScreen() {
             st = { kind: r.status, reason: r.reason };
           }
         } catch (e) {
-          st = isCancelled(e) ? { kind: 'skipped', reason: 'Cancelled' } : { kind: 'failed', reason: String((e as Error).message ?? e) };
+          st = isCancelled(e) ? { kind: 'skipped', reason: 'Cancelled' } : { kind: 'failed', reason: errorMessage(e) };
         }
         results[v.id] = st;
         setStatus((s) => ({ ...s, [v.id]: st }));
@@ -188,7 +184,7 @@ export default function CompressScreen() {
         Alert.alert('Originals kept', 'Both versions are now in your gallery.');
       }
     } catch (e) {
-      Alert.alert('Could not remove originals', String((e as Error).message ?? e));
+      Alert.alert('Could not remove originals', errorMessage(e));
     }
   };
 
@@ -242,7 +238,7 @@ export default function CompressScreen() {
                 label={allOn ? 'Clear' : 'Select all'}
                 variant="ghost"
                 size="sm"
-                onPress={() => setSelected(allOn ? new Set() : new Set(compressible.map((v) => v.id)))}
+                onPress={() => setPicked(allOn ? new Set() : new Set(compressible.map((v) => v.id)))}
               />
             ) : null
           }

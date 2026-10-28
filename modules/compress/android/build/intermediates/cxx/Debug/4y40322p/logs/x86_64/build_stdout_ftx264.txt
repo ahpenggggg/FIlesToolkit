@@ -1,2 +1,0 @@
-ninja: Entering directory `/Users/kpboon/PersonalProject/FIlesToolkit/modules/compress/android/.cxx/Debug/4y40322p/x86_64'
-ninja: no work to do.
