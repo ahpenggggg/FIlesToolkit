@@ -17,11 +17,11 @@ expo.modules.filetoolkit.archiver.filetoolkit-archiver-savedstate-1.2.1-15 /User
 expo.modules.filetoolkit.archiver.filetoolkit-archiver-lifecycle-livedata-2.6.2-16 /Users/kpboon/.gradle/caches/9.3.1/transforms/d93eebd16650e1b94354b7f42759244f/transformed/lifecycle-livedata-2.6.2/res
 expo.modules.filetoolkit.archiver.filetoolkit-archiver-lifecycle-runtime-2.6.2-17 /Users/kpboon/.gradle/caches/9.3.1/transforms/ec3ff502ff541c7fa7c95a04cdbbb865/transformed/lifecycle-runtime-2.6.2/res
 expo.modules.filetoolkit.archiver.filetoolkit-archiver-annotation-experimental-1.4.0-18 /Users/kpboon/.gradle/caches/9.3.1/transforms/fb6e8f3273f20f17bd820e46d05209f5/transformed/annotation-experimental-1.4.0/res
-expo.modules.filetoolkit.archiver.filetoolkit-archiver-pngs-19 /Users/kpboon/Personal Project/FIlesToolkit/modules/archiver/android/build/generated/res/pngs/release
-expo.modules.filetoolkit.archiver.filetoolkit-archiver-resValues-20 /Users/kpboon/Personal Project/FIlesToolkit/modules/archiver/android/build/generated/res/resValues/release
-expo.modules.filetoolkit.archiver.filetoolkit-archiver-mergeReleaseResources-21 /Users/kpboon/Personal Project/FIlesToolkit/modules/archiver/android/build/intermediates/incremental/release/mergeReleaseResources/merged.dir
-expo.modules.filetoolkit.archiver.filetoolkit-archiver-mergeReleaseResources-22 /Users/kpboon/Personal Project/FIlesToolkit/modules/archiver/android/build/intermediates/incremental/release/mergeReleaseResources/stripped.dir
-expo.modules.filetoolkit.archiver.filetoolkit-archiver-release-23 /Users/kpboon/Personal Project/FIlesToolkit/modules/archiver/android/build/intermediates/merged_res/release/mergeReleaseResources
-expo.modules.filetoolkit.archiver.filetoolkit-archiver-main-24 /Users/kpboon/Personal Project/FIlesToolkit/modules/archiver/android/src/main/res
-expo.modules.filetoolkit.archiver.filetoolkit-archiver-release-25 /Users/kpboon/Personal Project/FIlesToolkit/modules/archiver/android/src/release/res
-expo.modules.filetoolkit.archiver.filetoolkit-archiver-release-26 /Users/kpboon/Personal Project/FIlesToolkit/modules/folder-access/android/build/intermediates/packaged_res/release/packageReleaseResources
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-pngs-19 /Users/kpboon/PersonalProject/FIlesToolkit/modules/archiver/android/build/generated/res/pngs/release
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-resValues-20 /Users/kpboon/PersonalProject/FIlesToolkit/modules/archiver/android/build/generated/res/resValues/release
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-mergeReleaseResources-21 /Users/kpboon/PersonalProject/FIlesToolkit/modules/archiver/android/build/intermediates/incremental/release/mergeReleaseResources/merged.dir
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-mergeReleaseResources-22 /Users/kpboon/PersonalProject/FIlesToolkit/modules/archiver/android/build/intermediates/incremental/release/mergeReleaseResources/stripped.dir
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-release-23 /Users/kpboon/PersonalProject/FIlesToolkit/modules/archiver/android/build/intermediates/merged_res/release/mergeReleaseResources
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-main-24 /Users/kpboon/PersonalProject/FIlesToolkit/modules/archiver/android/src/main/res
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-release-25 /Users/kpboon/PersonalProject/FIlesToolkit/modules/archiver/android/src/release/res
+expo.modules.filetoolkit.archiver.filetoolkit-archiver-release-26 /Users/kpboon/PersonalProject/FIlesToolkit/modules/folder-access/android/build/intermediates/packaged_res/release/packageReleaseResources

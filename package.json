@@ -39,7 +39,7 @@
     "apk": "expo prebuild -p android --no-install && cd android && ./gradlew assembleRelease && mkdir -p ../dist && cp app/build/outputs/apk/release/app-release.apk ../dist/FileToolkit-release.apk",
     "aab": "expo prebuild -p android --no-install && cd android && ./gradlew bundleRelease",
     "install:apk": "adb install -r android/app/build/outputs/apk/release/app-release.apk",
-    "test": "node --test --experimental-strip-types --no-warnings modules/file-rename/grouping.test.ts modules/file-rename/model.test.ts modules/compress/plan.test.ts modules/folder-rename/naming.test.ts modules/folder-access/names.test.ts modules/archiver/naming.test.ts"
+    "test": "node --test --experimental-strip-types --no-warnings modules/file-rename/grouping.test.ts modules/file-rename/model.test.ts modules/compress/plan.test.ts modules/folder-rename/naming.test.ts modules/folder-access/names.test.ts modules/archiver/naming.test.ts modules/cleaner/model.test.ts"
   },
   "private": true
 }

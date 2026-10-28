@@ -1,11 +1,12 @@
 # FileToolkit
 
-On-device tools for tidying a phone, in one React Native / Expo app (Android and iOS). It combines DupeSweep (Duplicates, Compress video) and FolderRenamer (Folder names, File names), plus Archives. Compress video and Archives are Android only. Nothing leaves the phone.
+On-device tools for tidying a phone, in one React Native / Expo app (Android and iOS). It combines DupeSweep (Duplicates, Compress video) and FolderRenamer (Folder names, File names), plus System cleaner and Archives. Compress video, System cleaner and Archives are Android only. Nothing leaves the phone.
 
 | Tool | What it does |
 |---|---|
 | **Duplicates** | Finds photos and videos that are ≥ 80% similar (adjustable), keeps the best copy of each group and pre-selects the rest for Trash. |
 | **Compress video** (Android) | Re-encodes videos with HandBrake's settings (default preset, 720p HD, RF 26) using x264, in the background with a progress notification. |
+| **System cleaner** (Android) | Finds and deletes files nothing uses any more: leftovers of removed apps, expired Trash, unfinished saves and downloads, empty files and folders. Anything over 50 MB is listed to check first. |
 | **Folder names** | Renames each child folder of a picked folder from its photo and video count, e.g. `1V20P` or `JAMES_22V21P`. |
 | **File names** | Groups files with look-alike names so each group can be renamed in one go: `Name_00001.jpg`, `Name_00002.mp4`, … |
 | **Archives** (Android) | Creates ZIPs from files and folders, with an AES-256 password and/or split into parts; extracts ZIP (incl. split and password), RAR 4/5 (incl. password and multi-part) and 7Z. |
@@ -15,11 +16,12 @@ The app opens on a home screen with a grid of tool tiles (what each tool does is
 **One task at a time.** A tool's screen stays alive after you leave it (tabs without a tab bar, see `src/app/_layout.tsx`), so a running scan, rename or archive job keeps going and opening the tool again shows its progress. While it runs, its home tile shows *Running* and every other tool shows "… is running" with an **Open** button in place of its action (`src/lib/tasks.ts`).
 
 - **Duplicates / Compress video:** no folders are selected by default. Choose **All** or specific folders first; Compress lists videos only after you tap **Find videos**.
+- **System cleaner:** scans all storage, but only after you tap **Scan**.
 - **Folder names / File names:** the folder you picked is remembered (with its name), but it is only read when you pick it or tap **Scan folder** / **Rescan**.
 
-Every tool chooses folders (and files) the same way, with the shared `folder-picker` module: a **Folders card** on the tool screen and a **Choose folders sheet** that shows one level at a time with a path bar (`Storage › Internal storage › Download`), ticks, All / None and, for media, *Include subfolders*. Duplicates and Compress tick media folders; Folder names and File names pick one folder (storage roots, `Download` itself and `Android/` are protected); Archives picks files and folders to zip, an archive to extract, and destination folders. On iOS the rename tools use the Files folder picker, since iOS has no shared storage to browse. Folders and files are listed in natural order (`IMG_2` before `IMG_10`).
+Every tool chooses folders (and files) the same way, with the shared `folder-picker` module: a **Folders card** on the tool screen and a **Choose folders sheet** that shows one level at a time with a path bar (`Storage › Internal storage › Download`), ticks, All / None and, for media, *Include subfolders*. Duplicates and Compress tick media folders; Folder names and File names pick one folder (storage roots, `Download` itself and `Android/` are protected); Archives picks files and folders to zip, an archive to extract, and destination folders. On iOS the rename tools use the Files folder picker, since iOS has no shared storage to browse. Folders and files are listed in natural order (`IMG_2` before `IMG_10`). Big folders can take a moment to read: the folder being opened shows a spinner in place of its ›, and further opens and the path bar wait until it's in, so repeated taps can't jump levels.
 
-Long lists (the Choose folders sheet and the File names groups) use the shared `FastList` (`src/ui/FastList.tsx`): FlashList, so only the rows on screen are drawn and rows are recycled, plus a **fast scroller**: drag the thumb on the right edge to jump anywhere, with a bubble naming the item (or group) under it.
+Every long list (the Choose folders sheet, Duplicates groups, Compress videos, System cleaner results, Folder names preview, File names groups and an archive's contents) uses the shared `FastList` (`src/ui/FastList.tsx`): FlashList, so only the rows on screen are drawn and rows are recycled, plus a **fast scroller**: drag the thumb on the right edge to jump anywhere, with a bubble naming the item (or group) under it.
 
 The bottom button of every tool always offers the next step: **Choose folders → Scan / Find videos → act**.
 
@@ -31,9 +33,10 @@ On launch the app checks its two permissions and, if one is missing, shows what 
 |---|---|---|
 | Photos and videos (`READ_MEDIA_IMAGES` / `READ_MEDIA_VIDEO`) | Duplicates, Compress video | system prompt |
 | Notifications (`POST_NOTIFICATIONS`) | Compress video (progress while in the background) | system prompt when compressing starts; optional |
-| All files access (`MANAGE_EXTERNAL_STORAGE`) | Folder names, File names, Archives | toggle in Settings (the app opens the page) |
+| All files access (`MANAGE_EXTERNAL_STORAGE`) | System cleaner, Folder names, File names, Archives | toggle in Settings (the app opens the page) |
+| See all apps (`QUERY_ALL_PACKAGES`) | System cleaner (leftovers of removed apps) | granted on install |
 
-Each tool also checks again before it needs the permission. *All files access* is fine for sideloading; Google Play only allows it for apps whose core purpose is file management.
+Each tool also checks again before it needs the permission. *All files access* and *See all apps* are fine for sideloading; Google Play only allows them for apps whose core purpose needs them.
 
 ## Project layout
 
@@ -56,6 +59,10 @@ modules/
     android/             Transcoder.kt (decode → scale → x264 → MP4, AAC audio), X264.kt + cpp/x264_bridge.c
                          (JNI, Lanczos-3 scaler), CompressService.kt (foreground service), x264/ (prebuilt
                          static libraries per ABI and build.sh)
+  cleaner/               System cleaner (Android)
+    CleanerScreen.tsx, ReviewSheet.tsx (check an item over 50 MB), model.ts (kinds, 50 MB rule, rows), engine.ts
+    android/             Rules.kt (what can be cleaned), Cleaner.kt (scan, re-check and delete), CleanerModule.kt
+                         (+ a FileProvider to open a file in another app)
   folder-rename/         Folder names
     FolderRenameScreen.tsx, naming.ts (target names, conflicts), settings.ts, engine.ts
     android/ ios/        recursive photo/video count per child folder
@@ -117,6 +124,23 @@ Checked against desktop x264 at the same settings (`ffmpeg -c:v libx264 -preset 
 
 **Licence:** x264 is GPL-2.0-or-later, so an APK that contains it must be distributed under the GPL (fine for personal and sideloaded use). Rebuild the libraries with `modules/compress/android/x264/build.sh <x264 source>` (the commit used is in `X264_COMMIT`).
 
+## System cleaner (Android)
+
+Choose what to look for and tap **Scan**. Every folder on internal storage and SD cards is read; nothing is deleted until you tap **Clean** and confirm.
+
+| Kind | What counts |
+|---|---|
+| Leftovers of removed apps | `Android/media/<package>` folders of apps that are no longer installed (apps removed with "keep data" count as installed) |
+| Expired Trash | `.trashed-<expiry>-name` files whose 30 days in Trash ran out but that the system never removed |
+| Unfinished saves | `.pending-<expiry>-name` files an app never finished, past their expiry |
+| Temporary files | `.tmp`, `.temp`, `.crdownload`, `.part`, `.partial`, untouched for 24 hours |
+| Empty files | 0-byte files untouched for 24 hours; hidden ones such as `.nomedia` are kept |
+| Empty folders | folders with no file at any depth, untouched for 24 hours; only the topmost is listed. Hidden folders and the standard ones (`DCIM`, `Download`, `Pictures`, `DCIM/Camera` …) are kept |
+
+- **Over 50 MB:** such items are never selected for you. They are listed first under **Check before cleaning**, locked, and can be selected only after you open them: a folder shows its biggest files, a file opens in another app.
+- **Deleted for good:** cleaned items don't go to Trash. Each one is checked again just before it is deleted, so anything that changed since the scan (a folder that got a file, an app that was reinstalled) is left alone.
+- Inside `Android/` only the leftovers above are touched; inside hidden folders only expired Trash and unfinished saves. `Android/data` and `Android/obb` can't be read by any app since Android 11.
+
 ## Folder names
 
 1. Open **Folder names** and choose the parent folder, such as `Downloads/FFF`. Each folder directly inside it is scanned; media is counted recursively inside each one, and nested folders are not renamed on their own.
@@ -133,7 +157,7 @@ Zero-count segments are left out (`0V20P` becomes `20P`, `22V0P` becomes `22V`),
    - With it off, names that start alike are grouped too, so `file1`, `fileee12`, `file(2)` and `filexyz~1` form one group.
    - Files that match no other file, and names with fewer than two letters (`a1`, `x_2024`, `2024`), are gathered into one **Other files** group at the end.
    - **Gather small groups** (off by default) also moves every group with fewer than 5 files into **Other files**.
-3. Type a name for each group you want to rename, or tap the **Use …** suggestion. Tap a file to leave it out.
+3. Type a name for each group you want to rename, or tap the **Use …** suggestion. Tap a file to leave it out. Tap a group's header to close it (only its name field stays) and again to open it; a search shows matches in closed groups too.
    - The **search box** above the list keeps only the files whose name contains what you type (`11 of 3000`), showing every match, and jumps to the first one.
    - Big folders stay quick: the list is virtualized, the fast scroller on the right jumps between groups, and **Back to top** appears once you're a few screens down.
 4. Tap **Rename files** and confirm. Files become `Name_00001.jpg`, `Name_00002.mp4` and so on, numbered in the order shown. A group of one file gets the bare name.
@@ -147,7 +171,7 @@ Both rename tools rename in two passes (everything to a temporary name first, th
 
 **Create ZIP:** choose files and folders (folders are added with everything inside), where to save and a name (both default from the first item; a taken name gets a number). Options: compression (Store / Fast / Normal / Max), an AES-256 **password**, and **split into parts** (25 MB, 100 MB, 500 MB, 1 GB or a custom size), written as standard `name.z01`, `name.z02` … `name.zip`, which WinRAR, 7-Zip and WinZip open.
 
-**Extract:** choose an archive (for split or multi-part sets, the first part: the `.zip`, the `.part1.rar` or the `.001` — e.g. `myfile.zip.001`, `myfile.rar.001`, `myfile.7z.001` as cut by 7-Zip, WinRAR and other splitters); its format, file count, size and parts are listed. Enter the password if it has one; when even the file names are encrypted, tap **Unlock** first. Files go into a new folder named after the archive (`name (1)` if taken) or straight into a folder you choose; existing files are kept (both), replaced or skipped. A wrong password leaves nothing behind.
+**Extract:** choose an archive (for split or multi-part sets, the first part: the `.zip`, the `.part1.rar` or the `.001` — e.g. `myfile.zip.001`, `myfile.rar.001`, `myfile.7z.001` as cut by 7-Zip, WinRAR and other splitters); its format, file count, size and parts are listed, with **Show all** opening every file in a sheet. Enter the password if it has one; when even the file names are encrypted, tap **Unlock** first. Files go into a new folder named after the archive (`name (1)` if taken) or straight into a folder you choose; existing files are kept (both), replaced or skipped. A wrong password leaves nothing behind.
 
 | | Create | Extract |
 |---|---|---|

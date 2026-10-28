@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Any file on internal storage or an SD card can be opened for checking. -->
+<paths>
+  <root-path name="storage" path="/storage" />
+</paths>

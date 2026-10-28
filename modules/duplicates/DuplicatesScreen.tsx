@@ -1,13 +1,14 @@
 import Slider from '@react-native-community/slider';
 import { Image } from 'expo-image';
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import {
   ActionButton,
   Button,
   Card,
   Checkbox,
   EmptyState,
+  FastList,
   Hero,
   Icon,
   Pill,
@@ -160,12 +161,16 @@ export default function DuplicatesScreen() {
           />
         }
       >
-        <FlatList
+        <FastList
           data={groups}
           keyExtractor={(g) => g.id}
-          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 20, gap: 12 }}
+          extraData={selected}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 20 }}
+          ItemSeparatorComponent={Gap}
+          backToTop
+          labelFor={(g) => g.members[0].folder}
           ListHeaderComponent={
-            <View style={{ gap: 12 }}>
+            <View style={{ gap: 12, paddingBottom: 12 }}>
               <StatRow
                 items={[
                   { label: 'Groups', value: String(groups.length) },
@@ -317,6 +322,8 @@ function Tile({ m, keeper, selected, onPress }: { m: DupMember; keeper: boolean;
     </Pressable>
   );
 }
+
+const Gap = () => <View style={{ height: 12 }} />;
 
 function defaultSelection(groups: DupGroup[]) {
   return new Set(groups.flatMap((g) => g.members.slice(1).map((m) => m.id)));

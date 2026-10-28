@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { Alert, Keyboard, StyleSheet, View } from 'react-native';
 import { usePersistentState } from '@/lib/settings';
-import { ActionButton, Button, Card, Hero, Icon, Notice, Pill, ProgressCard, SectionLabel, StatRow, TextField, ToolScreen, Txt, mono, radius, usePalette, type Action } from '@/ui';
+import { ActionButton, Button, Card, FastList, Hero, Icon, Notice, Pill, ProgressCard, SectionLabel, StatRow, TextField, ToolScreen, Txt, mono, radius, usePalette, type Action } from '@/ui';
 import { cleanNameInput, useFolderTool } from '../folder-access';
 import { FolderRename } from './engine';
 import { EXAMPLE_BASE, currentPrefix, isUnchanged, planFolderNames, willRename, withPrefix, type FolderScan, type PlannedFolder } from './naming';
@@ -86,11 +86,8 @@ export default function FolderRenameScreen() {
   }
   const showList = !tool.busy && planned != null;
 
-  return (
-    <ToolScreen
-      tool="folders"
-      action={<ActionButton action={action} />}
-    >
+  const header = (
+    <View style={styles.header}>
       <Hero
         title="Rename folders by what's inside them."
         body="Pick a parent folder, preview the video and photo count of every child folder, then rename them in one go."
@@ -143,10 +140,28 @@ export default function FolderRenameScreen() {
       </SectionLabel>
       {notice ? <Notice message={notice.text} tone={notice.warn ? 'warn' : 'neutral'} /> : null}
       {tool.busy ? <ProgressCard progress={tool.progress} /> : null}
-      {showList ? planned!.map((entry) => <EntryRow key={entry.uri} entry={entry} />) : null}
+    </View>
+  );
+
+  return (
+    <ToolScreen tool="folders" scroll={false} action={<ActionButton action={action} />}>
+      <FastList
+        data={showList ? planned! : EMPTY}
+        keyExtractor={(e) => e.uri}
+        ListHeaderComponent={header}
+        contentContainerStyle={styles.content}
+        ItemSeparatorComponent={Gap}
+        keyboardShouldPersistTaps="handled"
+        backToTop
+        labelFor={(e) => e.name}
+        renderItem={({ item }) => <EntryRow entry={item} />}
+      />
     </ToolScreen>
   );
 }
+
+const EMPTY: PlannedFolder[] = [];
+const Gap = () => <View style={{ height: 12 }} />;
 
 function EntryRow({ entry }: { entry: PlannedFolder }) {
   const c = usePalette();
@@ -191,6 +206,8 @@ function EntryRow({ entry }: { entry: PlannedFolder }) {
 }
 
 const styles = StyleSheet.create({
+  header: { gap: 12, paddingBottom: 12 },
+  content: { paddingHorizontal: 16, paddingBottom: 24 },
   exampleRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   exampleChip: { paddingHorizontal: 9, paddingVertical: 4, borderRadius: radius.sm - 2 },
   entryTop: { flexDirection: 'row', alignItems: 'center', gap: 10 },

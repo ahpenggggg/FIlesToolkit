@@ -88,6 +88,10 @@ export default function FileRenameScreen() {
     (index: number) => setData((d) => (d ? { ...d, groups: d.groups.map((g, i) => (i === index ? { ...g, expanded: !g.expanded } : g)) } : d)),
     [setData],
   );
+  const toggleCollapsed = useCallback(
+    (index: number) => setData((d) => (d ? { ...d, groups: d.groups.map((g, i) => (i === index ? { ...g, collapsed: !g.collapsed } : g)) } : d)),
+    [setData],
+  );
 
   const busy = tool.busy;
   const toggleFile = useCallback(
@@ -253,9 +257,11 @@ export default function FileRenameScreen() {
                 other={group.other}
                 matching={r.matching}
                 total={r.total}
+                collapsed={r.collapsed}
                 searching={searching}
                 disabled={tool.busy}
                 onName={nameGroup}
+                onCollapse={toggleCollapsed}
               />
             );
           }
@@ -295,9 +301,11 @@ const GroupHead = memo(function GroupHead({
   other,
   matching,
   total,
+  collapsed,
   searching,
   disabled,
   onName,
+  onCollapse,
 }: {
   index: number;
   name: string;
@@ -305,9 +313,11 @@ const GroupHead = memo(function GroupHead({
   other: boolean;
   matching: number;
   total: number;
+  collapsed: boolean;
   searching: boolean;
   disabled: boolean;
   onName: (index: number, name: string) => void;
+  onCollapse: (index: number) => void;
 }) {
   const c = usePalette();
   const count = total === 1 ? '1 file' : `${total} files`;
@@ -315,7 +325,17 @@ const GroupHead = memo(function GroupHead({
   const placeholder = other ? 'Name these files' : suggestion === '' ? 'Name this group' : `e.g. ${suggestion}`;
   return (
     <View style={[styles.segment, styles.head, { backgroundColor: c.surface, borderColor: c.line }]}>
-      <View style={styles.groupHead}>
+      {/* Tapping the header opens or closes the group's file list; a search shows matches either way. */}
+      <Pressable
+        onPress={() => onCollapse(index)}
+        disabled={searching}
+        hitSlop={{ top: 16, bottom: 6 }}
+        accessibilityRole="button"
+        accessibilityState={{ expanded: !collapsed }}
+        accessibilityLabel={`${other ? 'Other files' : suggestion || 'Group'}, ${count}`}
+        accessibilityHint={collapsed ? 'Shows its files' : 'Hides its files'}
+        style={({ pressed }) => [styles.groupHead, { opacity: pressed ? 0.6 : 1 }]}
+      >
         <Icon name={other ? 'tray-full' : 'file-multiple-outline'} size={18} color={c.muted} />
         <Txt v="label" color={c.muted} style={{ flex: 1 }}>
           {other ? `Other files · ${label}` : label}
@@ -323,7 +343,8 @@ const GroupHead = memo(function GroupHead({
         {suggestion !== '' ? (
           <Pill label={`Use ${suggestion}`} tone="accent" icon="auto-fix" onPress={disabled ? undefined : () => onName(index, suggestion)} />
         ) : null}
-      </View>
+        {searching ? null : <Icon name={collapsed ? 'chevron-down' : 'chevron-up'} size={20} color={c.muted} />}
+      </Pressable>
       {other ? (
         <Txt v="caption" color={c.muted}>
           Files with no shared name pattern, gathered here.

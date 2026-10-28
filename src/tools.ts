@@ -22,10 +22,10 @@ export interface Tool {
   platforms?: ('android' | 'ios')[];
 }
 
-export type ToolKey = 'duplicates' | 'compress' | 'folders' | 'files' | 'archives';
+export type ToolKey = 'duplicates' | 'compress' | 'cleaner' | 'folders' | 'files' | 'archives';
 
 /** Tool groups, in home screen order: tools of a group sit together. */
-export const TOOL_GROUPS = ['Media cleanup', 'Organize', 'Archive'] as const;
+export const TOOL_GROUPS = ['Media cleanup', 'Storage cleanup', 'Organize', 'Archive'] as const;
 export type ToolGroup = (typeof TOOL_GROUPS)[number];
 
 export const TOOLS: Tool[] = [
@@ -46,6 +46,16 @@ export const TOOLS: Tool[] = [
     group: 'Media cleanup',
     icon: 'movie-open-outline',
     tint: { light: '#6A47D1', dark: '#BBA6FF' },
+    platforms: ['android'],
+  },
+  {
+    key: 'cleaner',
+    route: '/cleaner',
+    title: 'System cleaner',
+    summary: 'Delete leftovers of removed apps, stuck, temporary and empty files',
+    group: 'Storage cleanup',
+    icon: 'broom',
+    tint: { light: '#2E7D32', dark: '#86D98B' },
     platforms: ['android'],
   },
   {

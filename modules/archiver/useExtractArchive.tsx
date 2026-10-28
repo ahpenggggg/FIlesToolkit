@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { bytes } from '@/lib/format';
-import { Button, Card, Divider, Icon, Notice, SectionLabel, Segmented, TextField, Txt, usePalette, type Action } from '@/ui';
+import { Button, Card, Divider, FastList, Icon, Notice, SectionLabel, Segmented, Sheet, TextField, Txt, usePalette, type Action } from '@/ui';
 import { createStorageFolderSource, ensureAllFilesAccess, storagePathLabel } from '../folder-access';
 import { FolderPickerSheet, FolderScopeCard, type FolderSource } from '../folder-picker';
-import { Archiver, isPasswordError, type ArchiveInfo } from './engine';
+import { Archiver, isPasswordError, type ArchiveInfo, type ArchiveItem } from './engine';
 import { archiveBaseName, isArchiveName, parentOf } from './naming';
 import type { ArchiverSettings } from './settings';
 import type { ArchiveJob } from './useArchiveJob';
@@ -22,7 +22,8 @@ export function useExtractArchive(settings: ArchiverSettings, setSettings: (chan
   const [showPassword, setShowPassword] = useState(false);
   /** Where to extract; defaults to the archive's folder. */
   const [base, setBase] = useState<string | null>(null);
-  const [expanded, setExpanded] = useState(false);
+  /** The sheet listing every file in the archive. */
+  const [showAll, setShowAll] = useState(false);
   const [picker, setPicker] = useState<{ kind: 'archive' | 'folder'; source: FolderSource } | null>(null);
 
   const open = (kind: 'archive' | 'folder') => {
@@ -48,7 +49,6 @@ export function useExtractArchive(settings: ArchiverSettings, setSettings: (chan
     setArchive(path);
     setBase(parentOf(path));
     setPassword('');
-    setExpanded(false);
     job.setOutcome(null);
     // Choosing an archive lists what's in it; nothing is extracted until Extract is tapped.
     read(path, '');
@@ -92,7 +92,6 @@ export function useExtractArchive(settings: ArchiverSettings, setSettings: (chan
             : { label: 'Extract', icon: 'package-variant', onPress: extract };
 
   const files = (info?.items ?? []).filter((i) => !i.isDirectory);
-  const shown = expanded ? files : files.slice(0, PREVIEW_ROWS);
 
   const content = (
     <>
@@ -142,29 +141,48 @@ export function useExtractArchive(settings: ArchiverSettings, setSettings: (chan
       {info && files.length > 0 ? (
         <Card style={{ gap: 6 }}>
           <SectionLabel>{`Contents · ${info.fileCount}`}</SectionLabel>
-          {shown.map((f, i) => (
+          {files.slice(0, PREVIEW_ROWS).map((f, i) => (
             <View key={`${i}:${f.name}`}>
               {i > 0 ? <Divider /> : null}
-              <View style={styles.entry}>
-                <Icon name="file-outline" size={18} color={c.muted} />
-                <Txt v="small" numberOfLines={1} ellipsizeMode="middle" style={{ flex: 1 }}>
-                  {f.name}
-                </Txt>
-                <Txt v="caption" color={c.muted}>
-                  {bytes(f.size)}
-                </Txt>
-              </View>
+              <EntryRow item={f} />
             </View>
           ))}
           {files.length > PREVIEW_ROWS ? (
-            <Pressable onPress={() => setExpanded((e) => !e)} style={styles.row}>
+            <Pressable onPress={() => setShowAll(true)} style={styles.row}>
               <Txt v="smallStrong" color={c.accent}>
-                {expanded ? 'Show fewer' : `Show all ${files.length}${info.fileCount > files.length ? ` of ${info.fileCount}` : ''}`}
+                {`Show all ${files.length}${info.fileCount > files.length ? ` of ${info.fileCount}` : ''}`}
               </Txt>
-              <Icon name={expanded ? 'chevron-up' : 'chevron-down'} size={18} color={c.accent} />
+              <Icon name="chevron-right" size={18} color={c.accent} />
             </Pressable>
           ) : null}
         </Card>
+      ) : null}
+
+      {showAll && info ? (
+        <Sheet
+          visible
+          title={`Contents · ${info.fileCount}`}
+          closeLabel={null}
+          onClose={() => setShowAll(false)}
+          confirm={{ label: 'Done', onPress: () => setShowAll(false) }}
+        >
+          <FastList
+            data={files}
+            keyExtractor={(f, i) => `${i}:${f.name}`}
+            contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }}
+            ItemSeparatorComponent={Divider}
+            backToTop
+            labelFor={(f) => f.name.slice(f.name.lastIndexOf('/') + 1)}
+            ListFooterComponent={
+              info.fileCount > files.length ? (
+                <Txt v="caption" color={c.muted} style={{ paddingVertical: 12 }}>
+                  {`The first ${files.length} of ${info.fileCount} files are listed.`}
+                </Txt>
+              ) : null
+            }
+            renderItem={({ item }) => <EntryRow item={item} />}
+          />
+        </Sheet>
       ) : null}
 
       {archive ? (
@@ -237,6 +255,21 @@ export function useExtractArchive(settings: ArchiverSettings, setSettings: (chan
   );
 
   return { content, action };
+}
+
+function EntryRow({ item }: { item: ArchiveItem }) {
+  const c = usePalette();
+  return (
+    <View style={styles.entry}>
+      <Icon name="file-outline" size={18} color={c.muted} />
+      <Txt v="small" numberOfLines={1} ellipsizeMode="middle" style={{ flex: 1 }}>
+        {item.name}
+      </Txt>
+      <Txt v="caption" color={c.muted}>
+        {bytes(item.size)}
+      </Txt>
+    </View>
+  );
 }
 
 function isPasswordReadError(error: string | null) {

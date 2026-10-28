@@ -1,0 +1,35 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="expo.modules.filetoolkit.compress" >
+4
+5    <uses-sdk android:minSdkVersion="30" />
+6    <!-- Compressing can take a long time: a foreground service with a progress notification keeps it running. -->
+7    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+7-->/Users/kpboon/PersonalProject/FIlesToolkit/modules/compress/android/src/main/AndroidManifest.xml:3:3-75
+7-->/Users/kpboon/PersonalProject/FIlesToolkit/modules/compress/android/src/main/AndroidManifest.xml:3:20-72
+8    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+8-->/Users/kpboon/PersonalProject/FIlesToolkit/modules/compress/android/src/main/AndroidManifest.xml:4:3-85
+8-->/Users/kpboon/PersonalProject/FIlesToolkit/modules/compress/android/src/main/AndroidManifest.xml:4:20-82
+9    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROCESSING" />
+9-->/Users/kpboon/PersonalProject/FIlesToolkit/modules/compress/android/src/main/AndroidManifest.xml:5:3-92
+9-->/Users/kpboon/PersonalProject/FIlesToolkit/modules/compress/android/src/main/AndroidManifest.xml:5:20-89
+10    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+10-->/Users/kpboon/PersonalProject/FIlesToolkit/modules/compress/android/src/main/AndroidManifest.xml:6:3-75
+10-->/Users/kpboon/PersonalProject/FIlesToolkit/modules/compress/android/src/main/AndroidManifest.xml:6:20-72
+11    <uses-permission android:name="android.permission.WAKE_LOCK" />
+11-->/Users/kpboon/PersonalProject/FIlesToolkit/modules/compress/android/src/main/AndroidManifest.xml:7:3-66
+11-->/Users/kpboon/PersonalProject/FIlesToolkit/modules/compress/android/src/main/AndroidManifest.xml:7:20-63
+12
+13    <application>
+13-->/Users/kpboon/PersonalProject/FIlesToolkit/modules/compress/android/src/main/AndroidManifest.xml:8:3-13:17
+14        <service
+14-->/Users/kpboon/PersonalProject/FIlesToolkit/modules/compress/android/src/main/AndroidManifest.xml:9:5-12:66
+15            android:name="expo.modules.filetoolkit.compress.CompressService"
+15-->/Users/kpboon/PersonalProject/FIlesToolkit/modules/compress/android/src/main/AndroidManifest.xml:10:7-71
+16            android:exported="false"
+16-->/Users/kpboon/PersonalProject/FIlesToolkit/modules/compress/android/src/main/AndroidManifest.xml:11:7-31
+17            android:foregroundServiceType="dataSync|mediaProcessing" />
+17-->/Users/kpboon/PersonalProject/FIlesToolkit/modules/compress/android/src/main/AndroidManifest.xml:12:7-63
+18    </application>
+19
+20</manifest>

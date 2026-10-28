@@ -1,0 +1,42 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/src/main/AndroidManifest.xml:1:1-14:12
+INJECTED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/src/main/AndroidManifest.xml:1:1-14:12
+	package
+		INJECTED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/src/main/AndroidManifest.xml
+	xmlns:tools
+		ADDED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/src/main/AndroidManifest.xml:1:70-116
+	xmlns:android
+		ADDED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/src/main/AndroidManifest.xml:1:11-69
+uses-permission#android.permission.QUERY_ALL_PACKAGES
+ADDED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/src/main/AndroidManifest.xml:3:3-117
+	tools:ignore
+		ADDED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/src/main/AndroidManifest.xml:3:73-114
+	android:name
+		ADDED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/src/main/AndroidManifest.xml:3:20-72
+application
+ADDED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/src/main/AndroidManifest.xml:4:3-13:17
+provider#expo.modules.filetoolkit.cleaner.CleanerFileProvider
+ADDED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/src/main/AndroidManifest.xml:6:5-12:16
+	android:grantUriPermissions
+		ADDED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/src/main/AndroidManifest.xml:10:7-41
+	android:authorities
+		ADDED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/src/main/AndroidManifest.xml:8:7-59
+	android:exported
+		ADDED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/src/main/AndroidManifest.xml:9:7-31
+	android:name
+		ADDED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/src/main/AndroidManifest.xml:7:7-74
+meta-data#android.support.FILE_PROVIDER_PATHS
+ADDED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/src/main/AndroidManifest.xml:11:7-109
+	android:resource
+		ADDED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/src/main/AndroidManifest.xml:11:69-106
+	android:name
+		ADDED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/src/main/AndroidManifest.xml:11:18-68
+uses-sdk
+INJECTED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/src/main/AndroidManifest.xml
+INJECTED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/src/main/AndroidManifest.xml

@@ -1,7 +1,7 @@
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { Image } from 'expo-image';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, PermissionsAndroid, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Alert, PermissionsAndroid, Platform, Pressable, StyleSheet, View } from 'react-native';
 import {
   ActionButton,
   Button,
@@ -9,6 +9,7 @@ import {
   Checkbox,
   Divider,
   EmptyState,
+  FastList,
   Hero,
   Icon,
   ProgressBar,
@@ -198,6 +199,8 @@ export default function CompressScreen() {
 
   const visible = phase === 'browse' ? videos ?? [] : chosen;
   const browsing = phase === 'browse';
+  // What rows draw besides the video itself, so the list redraws them when it changes.
+  const rowState = useMemo(() => ({ selected, status, browsing }), [selected, status, browsing]);
 
   const header = (
     <View style={{ gap: 12, paddingBottom: 4 }}>
@@ -275,15 +278,15 @@ export default function CompressScreen() {
         )
       }
     >
-      <FlatList
+      <FastList
         data={videos == null ? [] : visible}
         keyExtractor={(v) => v.id}
+        extraData={rowState}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 20, flexGrow: 1 }}
         ListHeaderComponent={header}
         ItemSeparatorComponent={Gap}
-        initialNumToRender={8}
-        windowSize={7}
-        removeClippedSubviews
+        backToTop
+        labelFor={(v) => v.name}
         ListEmptyComponent={
           !scope.chosen ? (
             <EmptyState icon="folder-search-outline" title="Choose folders first" body="Pick all folders or specific ones to list their videos over 5 MB." />

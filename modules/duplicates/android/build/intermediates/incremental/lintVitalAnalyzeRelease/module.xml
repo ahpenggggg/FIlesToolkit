@@ -1,6 +1,6 @@
 <lint-module
     format="1"
-    dir="/Users/kpboon/Personal Project/FIlesToolkit/modules/duplicates/android"
+    dir="/Users/kpboon/PersonalProject/FIlesToolkit/modules/duplicates/android"
     name=":filetoolkit-duplicates"
     type="LIBRARY"
     maven="expo.modules.filetoolkit.duplicates:filetoolkit-duplicates:1.0.0"

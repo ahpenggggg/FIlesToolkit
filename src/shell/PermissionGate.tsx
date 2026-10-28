@@ -72,7 +72,7 @@ export function PermissionGate() {
         <PermissionRow
           icon="folder-key-outline"
           title="All files access"
-          body="Used by Folder names, File names and Archives to browse your folders, rename what you choose, and zip or extract files."
+          body="Used by System cleaner, Folder names, File names and Archives to browse your folders, clean up leftover files, rename what you choose, and zip or extract files."
           status={files ? 'allowed' : 'missing'}
           actionLabel="Open Settings"
           onAllow={() => FolderAccess.requestAllFilesAccess()}

@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Checkbox, Divider, FastList, Icon, Sheet, ToggleRow, Txt, usePalette } from '@/ui';
 import type { FolderNode, FolderSource } from './types';
@@ -44,6 +44,15 @@ export function FolderPickerSheet({
   const [selected, setSelected] = useState<string[]>([]);
   const [sub, setSub] = useState(initialSub);
   const [failed, setFailed] = useState(false);
+  /** False until the top level, and the way down to the current choice, are read. */
+  const [ready, setReady] = useState(false);
+  /**
+   * The folder being opened. Big folders take a while to read: meanwhile its row shows a spinner and
+   * other opens and the path bar wait, so extra taps can't stack levels. The ref guards taps that
+   * land before the re-render.
+   */
+  const [opening, setOpening] = useState<string | null>(null);
+  const openingRef = useRef(false);
   const includeSub = multiple && source.nested && (subfolderToggle ? sub : true);
   const canSelect = useCallback((n: FolderNode) => !n.blocked && (n.isFile ? selectable !== 'folders' : selectable !== 'files'), [selectable]);
 
@@ -92,6 +101,8 @@ export function FolderPickerSheet({
         }
       } catch {
         if (alive) setFailed(true);
+      } finally {
+        if (alive) setReady(true);
       }
     })();
     return () => {
@@ -105,7 +116,19 @@ export function FolderPickerSheet({
   const items = levels[current?.id ?? ''];
 
   const open = async (node: FolderNode) => {
-    if (!levels[node.id]) await load(node).catch(() => setLevels((cur) => ({ ...cur, [node.id]: [] })));
+    if (openingRef.current) return;
+    if (!levels[node.id]) {
+      openingRef.current = true;
+      setOpening(node.id);
+      try {
+        await load(node);
+      } catch {
+        setLevels((cur) => ({ ...cur, [node.id]: [] }));
+      } finally {
+        openingRef.current = false;
+        setOpening(null);
+      }
+    }
     setTrail((t) => [...t, node]);
   };
 
@@ -139,6 +162,7 @@ export function FolderPickerSheet({
   };
 
   const chosenName = selected[0]?.slice(selected[0].lastIndexOf('/') + 1);
+  const rowState = useMemo(() => ({ marks, opening }), [marks, opening]);
 
   return (
     <Sheet
@@ -175,7 +199,9 @@ export function FolderPickerSheet({
               <ToggleRow label="Include subfolders" icon="file-tree-outline" value={sub} onChange={setSub} />
             </View>
           ) : null}
-          {source.nested ? <PathBar rootLabel={source.rootLabel} trail={trail} onGo={(depth) => setTrail((t) => t.slice(0, depth))} /> : null}
+          {source.nested ? (
+            <PathBar rootLabel={source.rootLabel} trail={trail} disabled={opening != null} onGo={(depth) => setTrail((t) => t.slice(0, depth))} />
+          ) : null}
         </>
       }
     >
@@ -183,7 +209,7 @@ export function FolderPickerSheet({
         <Txt color={c.muted} style={styles.message}>
           Folders could not be read. Check that FileToolkit is allowed to access them.
         </Txt>
-      ) : items == null ? (
+      ) : items == null || !ready ? (
         <ActivityIndicator style={{ marginTop: 40 }} color={c.accent} />
       ) : items.length === 0 ? (
         <Txt color={c.muted} style={styles.message}>
@@ -193,12 +219,20 @@ export function FolderPickerSheet({
         <FastList
           data={items}
           keyExtractor={(n) => n.id}
-          extraData={marks}
+          extraData={rowState}
           contentContainerStyle={{ paddingBottom: 16 }}
           ItemSeparatorComponent={RowDivider}
           labelFor={(n) => n.name}
           renderItem={({ item: n }) => (
-            <PickerRow node={n} mark={marks(n.id)} pickable={canSelect(n)} nested={source.nested} onPress={pressRow} onOpen={openRow} />
+            <PickerRow
+              node={n}
+              mark={marks(n.id)}
+              pickable={canSelect(n)}
+              nested={source.nested}
+              loading={opening === n.id}
+              onPress={pressRow}
+              onOpen={openRow}
+            />
           )}
         />
       )}
@@ -215,6 +249,7 @@ const PickerRow = memo(function PickerRow({
   mark,
   pickable,
   nested,
+  loading,
   onPress,
   onOpen,
 }: {
@@ -222,6 +257,8 @@ const PickerRow = memo(function PickerRow({
   mark: Mark;
   pickable: boolean;
   nested: boolean;
+  /** Opening: its contents are being read. */
+  loading: boolean;
   onPress: (n: FolderNode, mark: Mark) => void;
   onOpen: (n: FolderNode) => void;
 }) {
@@ -246,7 +283,11 @@ const PickerRow = memo(function PickerRow({
           </Txt>
         ) : null}
       </View>
-      {n.hasChildren && nested ? (
+      {loading ? (
+        <View style={styles.openBtn} accessibilityLabel={`Opening ${n.name}`}>
+          <ActivityIndicator size="small" color={c.accent} style={styles.openSpinner} />
+        </View>
+      ) : n.hasChildren && nested ? (
         <Pressable onPress={() => onOpen(n)} hitSlop={10} style={styles.openBtn} accessibilityLabel={`Open ${n.name}`}>
           <Icon name="chevron-right" size={24} color={c.muted} />
         </Pressable>
@@ -256,14 +297,14 @@ const PickerRow = memo(function PickerRow({
 });
 
 /** Where you are: All folders › Android › media. Tap a crumb to go back up. */
-function PathBar({ rootLabel, trail, onGo }: { rootLabel: string; trail: FolderNode[]; onGo: (depth: number) => void }) {
+function PathBar({ rootLabel, trail, disabled, onGo }: { rootLabel: string; trail: FolderNode[]; disabled: boolean; onGo: (depth: number) => void }) {
   const c = usePalette();
   const crumbs = [rootLabel, ...trail.map((n) => n.name)];
   return (
     <View style={[styles.pathBar, { borderColor: c.line }]}>
       <Pressable
         onPress={() => onGo(Math.max(0, trail.length - 1))}
-        disabled={trail.length === 0}
+        disabled={disabled || trail.length === 0}
         hitSlop={8}
         accessibilityLabel="Up one folder"
         style={{ opacity: trail.length === 0 ? 0.3 : 1 }}
@@ -276,7 +317,7 @@ function PathBar({ rootLabel, trail, onGo }: { rootLabel: string; trail: FolderN
           return (
             <View key={`${i}:${name}`} style={styles.crumbs}>
               {i > 0 ? <Icon name="chevron-right" size={16} color={c.faint} /> : null}
-              <Pressable onPress={() => onGo(i)} disabled={last} hitSlop={6}>
+              <Pressable onPress={() => onGo(i)} disabled={disabled || last} hitSlop={6}>
                 <Txt v="smallStrong" color={last ? c.ink : c.accent} numberOfLines={1}>
                   {name}
                 </Txt>
@@ -297,5 +338,7 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingLeft: 20, paddingRight: 10 },
   boxSpace: { width: 22, alignItems: 'center' },
   openBtn: { padding: 6 },
+  // Same footprint as the 24px chevron, so the row doesn't shift.
+  openSpinner: { width: 24, height: 24 },
   message: { padding: 20 },
 });

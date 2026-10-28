@@ -1,6 +1,6 @@
 <lint-module
     format="1"
-    dir="/Users/kpboon/Personal Project/FIlesToolkit/modules/folder-rename/android"
+    dir="/Users/kpboon/PersonalProject/FIlesToolkit/modules/folder-rename/android"
     name=":filetoolkit-folder-rename"
     type="LIBRARY"
     maven="expo.modules.filetoolkit.folderrename:filetoolkit-folder-rename:1.0.0"

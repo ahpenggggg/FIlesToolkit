@@ -1,0 +1,3 @@
+/Users/kpboon/PersonalProject/FIlesToolkit/modules/compress/android/.cxx/Debug/4y40322p/armeabi-v7a/CMakeFiles/ftx264.dir
+/Users/kpboon/PersonalProject/FIlesToolkit/modules/compress/android/.cxx/Debug/4y40322p/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/kpboon/PersonalProject/FIlesToolkit/modules/compress/android/.cxx/Debug/4y40322p/armeabi-v7a/CMakeFiles/rebuild_cache.dir

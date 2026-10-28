@@ -1,16 +1,16 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /Users/kpboon/Personal Project/FIlesToolkit/modules/folder-access/android/src/main/AndroidManifest.xml:1:1-72
-INJECTED from /Users/kpboon/Personal Project/FIlesToolkit/modules/folder-access/android/src/main/AndroidManifest.xml:1:1-72
+ADDED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/folder-access/android/src/main/AndroidManifest.xml:1:1-72
+INJECTED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/folder-access/android/src/main/AndroidManifest.xml:1:1-72
 	package
-		INJECTED from /Users/kpboon/Personal Project/FIlesToolkit/modules/folder-access/android/src/main/AndroidManifest.xml
+		INJECTED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/folder-access/android/src/main/AndroidManifest.xml
 	xmlns:android
-		ADDED from /Users/kpboon/Personal Project/FIlesToolkit/modules/folder-access/android/src/main/AndroidManifest.xml:1:11-69
+		ADDED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/folder-access/android/src/main/AndroidManifest.xml:1:11-69
 uses-sdk
-INJECTED from /Users/kpboon/Personal Project/FIlesToolkit/modules/folder-access/android/src/main/AndroidManifest.xml reason: use-sdk injection requested
-INJECTED from /Users/kpboon/Personal Project/FIlesToolkit/modules/folder-access/android/src/main/AndroidManifest.xml
-INJECTED from /Users/kpboon/Personal Project/FIlesToolkit/modules/folder-access/android/src/main/AndroidManifest.xml
+INJECTED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/folder-access/android/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/folder-access/android/src/main/AndroidManifest.xml
+INJECTED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/folder-access/android/src/main/AndroidManifest.xml
 	android:targetSdkVersion
-		INJECTED from /Users/kpboon/Personal Project/FIlesToolkit/modules/folder-access/android/src/main/AndroidManifest.xml
+		INJECTED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/folder-access/android/src/main/AndroidManifest.xml
 	android:minSdkVersion
-		INJECTED from /Users/kpboon/Personal Project/FIlesToolkit/modules/folder-access/android/src/main/AndroidManifest.xml
+		INJECTED from /Users/kpboon/PersonalProject/FIlesToolkit/modules/folder-access/android/src/main/AndroidManifest.xml

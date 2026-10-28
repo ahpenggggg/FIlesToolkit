@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/Users/kpboon/PersonalProject/FIlesToolkit/modules/compress/android/.cxx/Debug/4y40322p/x86_64",
+  "command": "/Users/kpboon/Library/Android/sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=x86_64-none-linux-android30 --sysroot=/Users/kpboon/Library/Android/sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -Dftx264_EXPORTS -I/Users/kpboon/PersonalProject/FIlesToolkit/modules/compress/android/src/main/cpp/../../../x264/x86_64/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fno-limit-debug-info  -fPIC -O3 -Wall -o CMakeFiles/ftx264.dir/x264_bridge.c.o -c /Users/kpboon/PersonalProject/FIlesToolkit/modules/compress/android/src/main/cpp/x264_bridge.c",
+  "file": "/Users/kpboon/PersonalProject/FIlesToolkit/modules/compress/android/src/main/cpp/x264_bridge.c"
+}
+]

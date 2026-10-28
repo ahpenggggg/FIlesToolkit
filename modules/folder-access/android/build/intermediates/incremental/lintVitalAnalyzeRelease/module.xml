@@ -1,6 +1,6 @@
 <lint-module
     format="1"
-    dir="/Users/kpboon/Personal Project/FIlesToolkit/modules/folder-access/android"
+    dir="/Users/kpboon/PersonalProject/FIlesToolkit/modules/folder-access/android"
     name=":filetoolkit-folder-access"
     type="LIBRARY"
     maven="expo.modules.filetoolkit.folderaccess:filetoolkit-folder-access:1.0.0"

@@ -2,7 +2,7 @@ import { assignTargets, extensionOf, group, naturalCompare, stemOf, suggestionFo
 
 /** With "Gather small groups" on, groups smaller than this go to Other files. */
 export const SMALL_GROUP_SIZE = 5;
-/** Rows shown per group before "Show all". */
+/** Rows shown per open group before "Show all". */
 export const COLLAPSED_FILE_ROWS = 6;
 
 export interface FileItem {
@@ -27,7 +27,10 @@ export interface FileGroup {
   name: string;
   /** The Other files group: names with no shared pattern. */
   other: boolean;
+  /** Shows every file, not just the first COLLAPSED_FILE_ROWS. */
   expanded: boolean;
+  /** Closed by tapping its header: only the header (and its name field) shows. */
+  collapsed: boolean;
 }
 
 export function buildScan(rootName: string, children: { uri: string; name: string; isDirectory: boolean }[]): FileScan {
@@ -68,7 +71,7 @@ export function regroup(scan: FileScan, previousGroups: FileGroup[], strictMatch
         break;
       }
     }
-    return { files: indexes, suggestion, name, other, expanded: false };
+    return { files: indexes, suggestion, name, other, expanded: false, collapsed: false };
   });
 
   // Biggest groups first; the files with no pattern go last.
@@ -139,7 +142,7 @@ export const stageSuffixOf = extensionOf;
 
 /** One row of the virtualized group list: a group's header, one of its files, or its footer. */
 export type GroupRow =
-  | { type: 'head'; key: string; groupIndex: number; matching: number; total: number }
+  | { type: 'head'; key: string; groupIndex: number; matching: number; total: number; collapsed: boolean }
   | { type: 'file'; key: string; groupIndex: number; fileIndex: number; first: boolean }
   | { type: 'foot'; key: string; groupIndex: number; hidden: number; total: number; expanded: boolean };
 
@@ -150,8 +153,8 @@ export function groupKey(scan: FileScan, group: FileGroup): string {
 
 /**
  * Flattens groups into list rows so only what's on screen is drawn. A search keeps only the files
- * whose name contains it (ignoring case), drops groups without any, and shows every match;
- * otherwise collapsed groups show their first COLLAPSED_FILE_ROWS files.
+ * whose name contains it (ignoring case), drops groups without any, and shows every match, closed
+ * groups too; otherwise a closed group shows no files and an open one its first COLLAPSED_FILE_ROWS.
  */
 export function groupRows(scan: FileScan, groups: FileGroup[], query: string): { rows: GroupRow[]; matches: number } {
   const q = query.trim().toLowerCase();
@@ -161,17 +164,19 @@ export function groupRows(scan: FileScan, groups: FileGroup[], query: string): {
     const files = q ? group.files.filter((i) => scan.files[i].name.toLowerCase().includes(q)) : group.files;
     if (files.length === 0) return;
     matches += files.length;
-    const shown = q || group.expanded ? files : files.slice(0, COLLAPSED_FILE_ROWS);
+    const collapsed = !q && group.collapsed;
+    const shown = collapsed ? [] : q || group.expanded ? files : files.slice(0, COLLAPSED_FILE_ROWS);
     const key = groupKey(scan, group);
-    rows.push({ type: 'head', key: `h:${key}`, groupIndex, matching: files.length, total: group.files.length });
+    rows.push({ type: 'head', key: `h:${key}`, groupIndex, matching: files.length, total: group.files.length, collapsed });
     shown.forEach((fileIndex, i) => rows.push({ type: 'file', key: `f:${scan.files[fileIndex].uri}`, groupIndex, fileIndex, first: i === 0 }));
     rows.push({
       type: 'foot',
       key: `t:${key}`,
       groupIndex,
-      hidden: files.length - shown.length,
+      // A closed group's files are behind its header, not a "Show all" link.
+      hidden: collapsed ? 0 : files.length - shown.length,
       total: group.files.length,
-      expanded: !q && group.expanded && group.files.length > COLLAPSED_FILE_ROWS,
+      expanded: !collapsed && !q && group.expanded && group.files.length > COLLAPSED_FILE_ROWS,
     });
   });
   return { rows, matches };

@@ -1,0 +1,10 @@
+{
+  "name": "filetoolkit-cleaner",
+  "version": "1.0.0",
+  "description": "FileToolkit System cleaner: find and delete leftover, stuck and empty files and folders",
+  "main": "index.ts",
+  "types": "index.ts",
+  "license": "MIT",
+  "author": "JP",
+  "homepage": "https://github.com/ahpenggggg"
+}

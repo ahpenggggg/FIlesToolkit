@@ -11,11 +11,11 @@ const scan: FileScan = {
   ]),
 };
 const groups: FileGroup[] = [
-  { files: Array.from({ length: 10 }, (_, i) => i), suggestion: 'IMG', name: '', other: false, expanded: false },
-  { files: [10], suggestion: '', name: '', other: true, expanded: false },
+  { files: Array.from({ length: 10 }, (_, i) => i), suggestion: 'IMG', name: '', other: false, expanded: false, collapsed: false },
+  { files: [10], suggestion: '', name: '', other: true, expanded: false, collapsed: false },
 ];
 
-test('collapsed groups show their first rows and a footer counting the rest', () => {
+test('open groups show their first rows and a footer counting the rest', () => {
   const { rows, matches } = groupRows(scan, groups, '');
   assert.equal(matches, 11);
   assert.deepEqual(
@@ -29,6 +29,26 @@ test('collapsed groups show their first rows and a footer counting the rest', ()
 test('expanded groups show every file', () => {
   const { rows } = groupRows(scan, [{ ...groups[0], expanded: true }, groups[1]], '');
   assert.equal(rows.filter((r) => r.type === 'file').length, 11);
+});
+
+test('closed groups show only their header and footer', () => {
+  const { rows, matches } = groupRows(scan, [{ ...groups[0], collapsed: true, expanded: true }, groups[1]], '');
+  assert.equal(matches, 11);
+  assert.deepEqual(
+    rows.map((r) => r.type),
+    ['head', 'foot', 'head', 'file', 'foot'],
+  );
+  const [head, foot] = rows;
+  assert.equal(head.type === 'head' && head.collapsed, true);
+  assert.equal(foot.type === 'foot' && (foot.hidden > 0 || foot.expanded), false);
+});
+
+test('a search opens closed groups to show their matches', () => {
+  const { rows } = groupRows(scan, [{ ...groups[0], collapsed: true }, groups[1]], 'img_1');
+  assert.deepEqual(
+    rows.map((r) => r.type),
+    ['head', 'file', 'foot'],
+  );
 });
 
 test('search keeps matching files, drops empty groups and shows every match', () => {

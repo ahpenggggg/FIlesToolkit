@@ -1,0 +1,8 @@
+expo.modules.filetoolkit.cleaner.filetoolkit-cleaner-pngs-0 /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/build/generated/res/pngs/release
+expo.modules.filetoolkit.cleaner.filetoolkit-cleaner-resValues-1 /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/build/generated/res/resValues/release
+expo.modules.filetoolkit.cleaner.filetoolkit-cleaner-mergeReleaseResources-2 /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/build/intermediates/incremental/release/mergeReleaseResources/merged.dir
+expo.modules.filetoolkit.cleaner.filetoolkit-cleaner-mergeReleaseResources-3 /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/build/intermediates/incremental/release/mergeReleaseResources/stripped.dir
+expo.modules.filetoolkit.cleaner.filetoolkit-cleaner-release-4 /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/build/intermediates/merged_res/release/mergeReleaseResources
+expo.modules.filetoolkit.cleaner.filetoolkit-cleaner-main-5 /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/src/main/res
+expo.modules.filetoolkit.cleaner.filetoolkit-cleaner-release-6 /Users/kpboon/PersonalProject/FIlesToolkit/modules/cleaner/android/src/release/res
+expo.modules.filetoolkit.cleaner.filetoolkit-cleaner-release-7 /Users/kpboon/PersonalProject/FIlesToolkit/modules/folder-access/android/build/intermediates/packaged_res/release/packageReleaseResources

@@ -1,6 +1,6 @@
 <lint-module
     format="1"
-    dir="/Users/kpboon/Personal Project/FIlesToolkit/modules/archiver/android"
+    dir="/Users/kpboon/PersonalProject/FIlesToolkit/modules/archiver/android"
     name=":filetoolkit-archiver"
     type="LIBRARY"
     maven="expo.modules.filetoolkit.archiver:filetoolkit-archiver:1.0.0"

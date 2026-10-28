@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="expo.modules.filetoolkit.cleaner" >
+
+    <uses-sdk android:minSdkVersion="30" />
+    <!-- Leftovers of removed apps: telling an uninstalled app from a hidden one needs to see every installed app. -->
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+
+    <application>
+
+        <!-- Opens a file in another app so it can be checked before it's cleaned. -->
+        <provider
+            android:name="expo.modules.filetoolkit.cleaner.CleanerFileProvider"
+            android:authorities="dollar_openBracket_applicationId_closeBracket.cleaner.files"
+            android:exported="false"
+            android:grantUriPermissions="true" >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/cleaner_paths" />
+        </provider>
+    </application>
+
+</manifest>
