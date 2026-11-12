@@ -11,6 +11,23 @@ On-device tools for tidying a phone, in one React Native / Expo app (Android and
 | **File names** | Groups files with look-alike names so each group can be renamed in one go: `Name_00001.jpg`, `Name_00002.mp4`, … |
 | **Archives** (Android) | Creates ZIPs from files and folders, with an AES-256 password and/or split into parts; extracts ZIP (incl. split and password), RAR 4/5 (incl. password and multi-part) and 7Z. |
 
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshots/home.jpg" width="200" alt="Home screen"><br><sub>Home</sub></td>
+    <td align="center"><img src="docs/screenshots/duplicates.jpg" width="200" alt="Duplicates"><br><sub>Duplicates</sub></td>
+    <td align="center"><img src="docs/screenshots/compress.jpg" width="200" alt="Compress video"><br><sub>Compress video</sub></td>
+    <td align="center"><img src="docs/screenshots/cleaner.jpg" width="200" alt="System cleaner"><br><sub>System cleaner</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/folder-names.jpg" width="200" alt="Folder names"><br><sub>Folder names</sub></td>
+    <td align="center"><img src="docs/screenshots/file-names.jpg" width="200" alt="File names"><br><sub>File names</sub></td>
+    <td align="center"><img src="docs/screenshots/archives.jpg" width="200" alt="Archives"><br><sub>Archives</sub></td>
+    <td></td>
+  </tr>
+</table>
+
 The app opens on a home screen with a grid of tool tiles (what each tool does is in the info tip on its screen). The tool that was open last time reopens on launch, but **nothing is scanned automatically**: each tool waits for you to choose folders and press a button.
 
 **One task at a time.** A tool's screen stays alive after you leave it (tabs without a tab bar, see `src/app/_layout.tsx`), so a running scan, rename or archive job keeps going and opening the tool again shows its progress. While it runs, its home tile shows *Running* and every other tool shows "… is running" with an **Open** button in place of its action (`src/lib/tasks.ts`).
