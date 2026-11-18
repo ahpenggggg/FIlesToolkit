@@ -12,6 +12,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -48,3 +50,12 @@ jobs:
         with:
           name: FileToolkit-apk
           path: android/app/build/outputs/apk/release/*.apk
+      # A version tag also publishes the APK, so anyone can download it without signing in.
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/release/*.apk "FileToolkit-$GITHUB_REF_NAME.apk"
+          gh release create "$GITHUB_REF_NAME" "FileToolkit-$GITHUB_REF_NAME.apk" \
+            --title "FileToolkit $GITHUB_REF_NAME" --generate-notes
