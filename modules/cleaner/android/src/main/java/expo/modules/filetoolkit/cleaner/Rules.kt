@@ -1,6 +1,7 @@
 package expo.modules.filetoolkit.cleaner
 
 import android.content.Context
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import java.io.File
@@ -16,6 +17,8 @@ enum class Kind(val key: String) {
     EXPIRED_PENDING("expiredPending"),
     /** .tmp files and unfinished downloads. */
     TEMP("temp"),
+    /** App installer files (.apk, .apks, .xapk, .apkm) left after installing. */
+    APK("apk"),
     /** 0-byte files. */
     EMPTY_FILE("emptyFile"),
     /** Folders without a single file inside, at any depth. */
@@ -35,7 +38,13 @@ object Rules {
     /** Untouched for at least this long: a younger file may still be in use (a download, a copy). */
     const val MIN_AGE_MS = 24 * 60 * 60 * 1000L
 
+    /** APKs only need to be left alone for a few minutes: long enough for a copy or an install to finish. */
+    const val APK_MIN_AGE_MS = 10 * 60 * 1000L
+
     private val TEMP_EXTENSIONS = setOf("tmp", "temp", "crdownload", "part", "partial")
+
+    /** Installer files: a plain APK, and the split-APK bundles of SAI, APKPure and APKMirror. */
+    private val APK_EXTENSIONS = setOf("apk", "apks", "xapk", "apkm")
 
     /** MediaStore's stand-ins: ".trashed-<expiry>-name" and ".pending-<expiry>-name", expiry in seconds. */
     private val EXPIRING = Regex("""^\.(pending|trashed)-(\d+)-.+""")
@@ -65,8 +74,10 @@ object Rules {
             return if (match.groupValues[1] == "trashed") Kind.EXPIRED_TRASH else Kind.EXPIRED_PENDING
         }
         if (inHidden || name.startsWith(".")) return null
+        val ext = name.substringAfterLast('.', "").lowercase()
+        if (ext in APK_EXTENSIONS) return if (now - file.lastModified() >= APK_MIN_AGE_MS) Kind.APK else null
         if (now - file.lastModified() < MIN_AGE_MS) return null
-        if (name.substringAfterLast('.', "").lowercase() in TEMP_EXTENSIONS) return Kind.TEMP
+        if (ext in TEMP_EXTENSIONS) return Kind.TEMP
         if (file.length() == 0L) return Kind.EMPTY_FILE
         return null
     }
@@ -121,4 +132,61 @@ object Rules {
         val pkg = mediaFolderPackage(rel) ?: return false
         return pkg != ctx.packageName && canSeeAllApps(ctx) && !isInstalled(ctx, pkg)
     }
+
+    /**
+     * What app an installer file holds and how it compares with what's installed. Split bundles
+     * (.apks, .xapk, .apkm) are archives Android can't read directly, so they come back as UNKNOWN.
+     */
+    fun apkInfo(ctx: Context, file: File): ApkInfo {
+        val pm = ctx.packageManager
+        val archive = try {
+            @Suppress("DEPRECATION")
+            pm.getPackageArchiveInfo(file.path, 0)
+        } catch (e: Exception) {
+            null
+        } ?: return ApkInfo(null, null, ApkStatus.UNKNOWN)
+        val app = archive.applicationInfo?.let { info ->
+            // The label is only readable once the archive's path is set as the app's source.
+            info.sourceDir = file.path
+            info.publicSourceDir = file.path
+            try {
+                info.loadLabel(pm).toString()
+            } catch (e: Exception) {
+                null
+            }
+        } ?: archive.packageName
+        val status = when {
+            archive.packageName == null || !canSeeAllApps(ctx) -> ApkStatus.UNKNOWN
+            else -> {
+                val installed = try {
+                    @Suppress("DEPRECATION")
+                    pm.getPackageInfo(archive.packageName, 0)
+                } catch (e: PackageManager.NameNotFoundException) {
+                    null
+                }
+                when {
+                    installed == null -> ApkStatus.NOT_INSTALLED
+                    versionCode(installed) >= versionCode(archive) -> ApkStatus.INSTALLED
+                    else -> ApkStatus.NEWER
+                }
+            }
+        }
+        return ApkInfo(app, archive.versionName, status)
+    }
+
+    private fun versionCode(info: PackageInfo): Long =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) info.longVersionCode else @Suppress("DEPRECATION") info.versionCode.toLong()
 }
+
+/** How an installer file compares with the installed app. Keep the keys in step with ApkStatus in engine.ts. */
+enum class ApkStatus(val key: String) {
+    /** The same version, or a newer one, is installed: the file isn't needed any more. */
+    INSTALLED("installed"),
+    /** The file is newer than the installed app: an update not yet installed. */
+    NEWER("newer"),
+    NOT_INSTALLED("notInstalled"),
+    /** A split bundle, a damaged file, or the installed apps can't be seen. */
+    UNKNOWN("unknown"),
+}
+
+class ApkInfo(val app: String?, val version: String?, val status: ApkStatus)

@@ -64,6 +64,7 @@ class CleanerModule : Module() {
                             "size" to found.size.toDouble(),
                             "files" to found.files,
                             "modified" to found.file.lastModified().toDouble(),
+                            "apk" to found.apk?.let { mapOf("app" to it.app, "version" to it.version, "status" to it.status.key) },
                         )
                     }
             }

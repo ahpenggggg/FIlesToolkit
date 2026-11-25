@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { CleanItem } from './engine.ts';
-import { REVIEW_BYTES, defaultSelection, displayName, needsReview, resultRows } from './model.ts';
+import { REVIEW_BYTES, apkLabel, defaultSelection, displayName, needsReview, resultRows } from './model.ts';
 
 function item(over: Partial<CleanItem>): CleanItem {
   return { path: '/storage/emulated/0/a', name: 'a', kind: 'temp', isDirectory: false, size: 10, files: 1, modified: 0, ...over };
@@ -39,4 +39,16 @@ test('big items are listed once, first, to check; the rest by kind, biggest firs
     ['head:review:1', '/big', 'head:temp:2', '/t2', '/t1', 'head:emptyFolder:1', '/e'],
   );
   assert.equal(rows.filter((r) => r.type === 'item' && r.review).length, 1);
+});
+
+test('APKs are never locked for checking; only those whose app is installed are selected', () => {
+  const installed = item({ path: '/i.apk', kind: 'apk', size: 90 * MB, apk: { app: 'Maps', version: '11.2', status: 'installed' } });
+  const newer = item({ path: '/n.apk', kind: 'apk', apk: { app: 'Maps', version: '12.0', status: 'newer' } });
+  const missing = item({ path: '/m.apk', kind: 'apk', apk: { app: 'Game', version: '1.0', status: 'notInstalled' } });
+  const bundle = item({ path: '/b.xapk', kind: 'apk', apk: { app: null, version: null, status: 'unknown' } });
+  assert.equal(needsReview(installed), false);
+  assert.deepEqual([...defaultSelection([installed, newer, missing, bundle])], ['/i.apk']);
+  assert.equal(apkLabel(installed), 'Maps 11.2 · Installed');
+  assert.equal(apkLabel(bundle), "Can't check");
+  assert.equal(apkLabel(item({ name: 'a.tmp' })), null);
 });

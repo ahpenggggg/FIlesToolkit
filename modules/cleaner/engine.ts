@@ -3,7 +3,21 @@ import { NativeModule, requireOptionalNativeModule } from 'expo';
 /** Native cleaner (Android): finds leftover and stuck files on shared storage and deletes the ones chosen. */
 
 /** Why an item can be cleaned. Keep in step with Kind in Rules.kt. */
-export type CleanKind = 'orphanApp' | 'expiredTrash' | 'expiredPending' | 'temp' | 'emptyFile' | 'emptyFolder';
+export type CleanKind = 'orphanApp' | 'expiredTrash' | 'expiredPending' | 'temp' | 'apk' | 'emptyFile' | 'emptyFolder';
+
+/**
+ * How an installer file compares with the installed app. Keep in step with ApkStatus in Rules.kt.
+ * installed: same or newer version installed · newer: an update not yet installed · unknown: a split
+ * bundle (.apks, .xapk, .apkm), a damaged file, or installed apps can't be seen.
+ */
+export type ApkStatus = 'installed' | 'newer' | 'notInstalled' | 'unknown';
+
+export interface ApkInfo {
+  /** App name, or its package when the name can't be read; null when the file can't be read. */
+  app: string | null;
+  version: string | null;
+  status: ApkStatus;
+}
 
 export interface CleanItem {
   path: string;
@@ -16,6 +30,8 @@ export interface CleanItem {
   files: number;
   /** Last modified, ms since 1970. */
   modified: number;
+  /** For installer files (kind 'apk'): the app inside. */
+  apk?: ApkInfo | null;
 }
 
 export interface FolderContents {

@@ -4,7 +4,7 @@ import android.content.Context
 import expo.modules.filetoolkit.folderaccess.Storage
 import java.io.File
 
-class Found(val file: File, val kind: Kind, val size: Long, val files: Int)
+class Found(val file: File, val kind: Kind, val size: Long, val files: Int, val apk: ApkInfo? = null)
 
 class CleanOutcome(val cleaned: List<String>, val failed: Int, val freed: Long)
 
@@ -41,7 +41,9 @@ class Cleaner(private val ctx: Context, private val check: () -> Unit) {
                 } else {
                     hasFiles = true
                     val kind = Rules.fileKind(f, inHidden, now)
-                    if (kind != null && kind in kinds) found += Found(f, kind, f.length(), 1)
+                    if (kind != null && kind in kinds) {
+                        found += Found(f, kind, f.length(), 1, if (kind == Kind.APK) Rules.apkInfo(ctx, f) else null)
+                    }
                 }
             }
             if (!hasFiles && Kind.EMPTY_FOLDER in kinds && Rules.mayRemoveEmptyFolder(dir, rel, inHidden, now)) {
