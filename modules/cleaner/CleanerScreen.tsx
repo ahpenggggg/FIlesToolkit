@@ -252,7 +252,7 @@ export default function CleanerScreen() {
     >
       <Hero
         title="Clear out leftover files."
-        body="Finds files and folders nothing uses any more: leftovers of removed apps, expired Trash, unfinished saves and downloads, leftover APK installers, and empty files and folders. Anything over 50 MB is listed for you to check before it can be cleaned."
+        body="Finds files and folders nothing uses any more: leftovers of removed apps, expired Trash, unfinished saves and downloads, leftover APK installers, computer leftovers, logs, backup copies, and empty files and folders. Anything over 50 MB is listed for you to check before it can be cleaned."
       />
       <Card>
         <SectionLabel>Look for</SectionLabel>

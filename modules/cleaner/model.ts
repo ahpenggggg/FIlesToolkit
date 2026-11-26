@@ -34,7 +34,7 @@ export const KINDS: KindInfo[] = [
   {
     key: 'temp',
     title: 'Temporary files',
-    note: '.tmp files and unfinished downloads (.crdownload, .part), untouched for a day.',
+    note: '.tmp files and unfinished downloads (.crdownload, .part) and torrents (.!qB, .!ut, .bc!, .aria2), untouched for a day.',
     icon: 'file-clock-outline',
   },
   {
@@ -42,6 +42,24 @@ export const KINDS: KindInfo[] = [
     title: 'Installer files (APKs)',
     note: 'App installers (.apk, .apks, .xapk, .apkm). Only those whose app is already installed are selected for you.',
     icon: 'android',
+  },
+  {
+    key: 'computerJunk',
+    title: 'Computer leftovers',
+    note: 'Files Windows and macOS leave when copying (Thumbs.db, desktop.ini, .DS_Store, ._ files) and __MACOSX folders from zips, untouched for a day.',
+    icon: 'laptop',
+  },
+  {
+    key: 'log',
+    title: 'Logs and crash files',
+    note: '.log, .dmp and .trace files, and bug reports (bugreport-….zip) in Download, untouched for a day.',
+    icon: 'text-box-outline',
+  },
+  {
+    key: 'backup',
+    title: 'Backup copies',
+    note: "Editors' and apps' leftover copies (name~, .bak, .old, .swp), untouched for a day.",
+    icon: 'backup-restore',
   },
   {
     key: 'emptyFile',
