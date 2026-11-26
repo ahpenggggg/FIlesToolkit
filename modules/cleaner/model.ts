@@ -1,5 +1,5 @@
 import type { IconName } from '@/ui';
-import type { CleanItem, CleanKind } from './engine';
+import type { ApkStatus, CleanItem, CleanKind } from './engine';
 
 /** Items bigger than this are never selected for you: they are listed to be checked first. */
 export const REVIEW_BYTES = 50 * 1024 * 1024;
@@ -34,8 +34,32 @@ export const KINDS: KindInfo[] = [
   {
     key: 'temp',
     title: 'Temporary files',
-    note: '.tmp files and unfinished downloads (.crdownload, .part), untouched for a day.',
+    note: '.tmp files and unfinished downloads (.crdownload, .part) and torrents (.!qB, .!ut, .bc!, .aria2), untouched for a day.',
     icon: 'file-clock-outline',
+  },
+  {
+    key: 'apk',
+    title: 'Installer files (APKs)',
+    note: 'App installers (.apk, .apks, .xapk, .apkm). Only those whose app is already installed are selected for you.',
+    icon: 'android',
+  },
+  {
+    key: 'computerJunk',
+    title: 'Computer leftovers',
+    note: 'Files Windows and macOS leave when copying (Thumbs.db, desktop.ini, .DS_Store, ._ files) and __MACOSX folders from zips, untouched for a day.',
+    icon: 'laptop',
+  },
+  {
+    key: 'log',
+    title: 'Logs and crash files',
+    note: '.log, .dmp and .trace files, and bug reports (bugreport-….zip) in Download, untouched for a day.',
+    icon: 'text-box-outline',
+  },
+  {
+    key: 'backup',
+    title: 'Backup copies',
+    note: "Editors' and apps' leftover copies (name~, .bak, .old, .swp), untouched for a day.",
+    icon: 'backup-restore',
   },
   {
     key: 'emptyFile',
@@ -55,14 +79,36 @@ export function kindInfo(kind: CleanKind): KindInfo {
   return KINDS.find((k) => k.key === kind)!;
 }
 
-/** Too big to clean without checking what it is first. */
+/**
+ * Too big to clean without checking what it is first. Installer files are exempt: opening one only
+ * starts installing it, and the app it holds is shown on its row instead.
+ */
 export function needsReview(item: CleanItem): boolean {
-  return item.size > REVIEW_BYTES;
+  return item.kind !== 'apk' && item.size > REVIEW_BYTES;
 }
 
-/** Everything up to 50 MB is selected; bigger items wait until they have been checked. */
+/**
+ * Selected for you: everything up to 50 MB, except installer files whose app isn't installed at that
+ * version (they may be the only copy). Bigger items wait until they have been checked.
+ */
 export function defaultSelection(items: CleanItem[]): Set<string> {
-  return new Set(items.filter((i) => !needsReview(i)).map((i) => i.path));
+  return new Set(items.filter((i) => !needsReview(i) && (i.kind !== 'apk' || i.apk?.status === 'installed')).map((i) => i.path));
+}
+
+const APK_STATUS: Record<ApkStatus, string> = {
+  installed: 'Installed',
+  newer: 'Newer than installed',
+  notInstalled: 'Not installed',
+  unknown: "Can't check",
+};
+
+/** "WhatsApp 2.24.1 · Installed": the app an installer file holds, and whether it's installed. */
+export function apkLabel(item: CleanItem): string | null {
+  if (item.kind !== 'apk') return null;
+  const apk = item.apk;
+  const app = [apk?.app, apk?.version].filter(Boolean).join(' ');
+  const status = APK_STATUS[apk?.status ?? 'unknown'];
+  return app ? `${app} · ${status}` : status;
 }
 
 /** The name people know: MediaStore's ".trashed-1700000000-IMG_1.jpg" is IMG_1.jpg. */

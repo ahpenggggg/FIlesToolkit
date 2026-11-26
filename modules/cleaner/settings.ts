@@ -6,5 +6,5 @@ export interface CleanerSettings {
 }
 
 export const DEFAULT_CLEANER_SETTINGS: CleanerSettings = {
-  kinds: ['orphanApp', 'expiredTrash', 'expiredPending', 'temp', 'emptyFile', 'emptyFolder'],
+  kinds: ['orphanApp', 'expiredTrash', 'expiredPending', 'temp', 'apk', 'computerJunk', 'log', 'backup', 'emptyFile', 'emptyFolder'],
 };

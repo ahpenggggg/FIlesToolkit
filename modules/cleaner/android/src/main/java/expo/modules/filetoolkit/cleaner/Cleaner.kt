@@ -4,7 +4,7 @@ import android.content.Context
 import expo.modules.filetoolkit.folderaccess.Storage
 import java.io.File
 
-class Found(val file: File, val kind: Kind, val size: Long, val files: Int)
+class Found(val file: File, val kind: Kind, val size: Long, val files: Int, val apk: ApkInfo? = null)
 
 class CleanOutcome(val cleaned: List<String>, val failed: Int, val freed: Long)
 
@@ -37,11 +37,20 @@ class Cleaner(private val ctx: Context, private val check: () -> Unit) {
                         hasFiles = true
                         continue
                     }
+                    if (Kind.COMPUTER_JUNK in kinds && Rules.isMacZipFolder(f, childRel, inHidden, now)) {
+                        // Listed whole; it counts as holding files so its parent isn't taken for empty.
+                        hasFiles = true
+                        val (size, files) = measure(f)
+                        found += Found(f, Kind.COMPUTER_JUNK, size, files)
+                        continue
+                    }
                     if (walk(f, childRel, inHidden || f.name.startsWith("."))) hasFiles = true
                 } else {
                     hasFiles = true
-                    val kind = Rules.fileKind(f, inHidden, now)
-                    if (kind != null && kind in kinds) found += Found(f, kind, f.length(), 1)
+                    val kind = Rules.fileKind(f, childRel, inHidden, now)
+                    if (kind != null && kind in kinds) {
+                        found += Found(f, kind, f.length(), 1, if (kind == Kind.APK) Rules.apkInfo(ctx, f) else null)
+                    }
                 }
             }
             if (!hasFiles && Kind.EMPTY_FOLDER in kinds && Rules.mayRemoveEmptyFolder(dir, rel, inHidden, now)) {
@@ -125,10 +134,11 @@ class Cleaner(private val ctx: Context, private val check: () -> Unit) {
 
     private fun stillQualifies(file: File, rel: String, kind: Kind): Boolean {
         val inHidden = Rules.inHiddenFolder(rel)
+        if (kind == Kind.COMPUTER_JUNK && file.isDirectory) return Rules.isMacZipFolder(file, rel, inHidden, now)
         return when (kind) {
             Kind.ORPHAN_APP -> file.isDirectory && Rules.isOrphanApp(ctx, rel)
             Kind.EMPTY_FOLDER -> file.isDirectory && Rules.mayRemoveEmptyFolder(file, rel, inHidden, now) && Rules.hasNoFiles(file)
-            else -> file.isFile && !Rules.isAppArea(rel) && Rules.fileKind(file, inHidden, now) == kind
+            else -> file.isFile && !Rules.isAppArea(rel) && Rules.fileKind(file, rel, inHidden, now) == kind
         }
     }
 

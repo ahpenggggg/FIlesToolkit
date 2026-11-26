@@ -29,7 +29,7 @@ import {
 } from '@/ui';
 import { ensureAllFilesAccess, parentOf, storagePathLabel } from '../folder-access';
 import { Cleaner, type CleanItem, type CleanKind } from './engine';
-import { KINDS, defaultSelection, displayName, needsReview, resultRows, type ResultRow } from './model';
+import { KINDS, apkLabel, defaultSelection, displayName, needsReview, resultRows, type ResultRow } from './model';
 import { ReviewSheet } from './ReviewSheet';
 import { DEFAULT_CLEANER_SETTINGS, type CleanerSettings } from './settings';
 
@@ -252,7 +252,7 @@ export default function CleanerScreen() {
     >
       <Hero
         title="Clear out leftover files."
-        body="Finds files and folders nothing uses any more: leftovers of removed apps, expired Trash, unfinished saves and downloads, and empty files and folders. Anything over 50 MB is listed for you to check before it can be cleaned."
+        body="Finds files and folders nothing uses any more: leftovers of removed apps, expired Trash, unfinished saves and downloads, leftover APK installers, computer leftovers, logs, backup copies, and empty files and folders. Anything over 50 MB is listed for you to check before it can be cleaned."
       />
       <Card>
         <SectionLabel>Look for</SectionLabel>
@@ -318,7 +318,14 @@ const ItemRow = memo(function ItemRow({
   onReview: (item: CleanItem) => void;
 }) {
   const c = usePalette();
-  const detail = item.isDirectory ? (item.files > 0 ? `${bytes(item.size)} · ${plural(item.files, 'file')}` : 'Empty') : bytes(item.size);
+  const apk = apkLabel(item);
+  const detail = item.isDirectory
+    ? item.files > 0
+      ? `${bytes(item.size)} · ${plural(item.files, 'file')}`
+      : 'Empty'
+    : apk
+      ? `${bytes(item.size)} · ${apk}`
+      : bytes(item.size);
   return (
     <Pressable
       onPress={() => onPress(item)}

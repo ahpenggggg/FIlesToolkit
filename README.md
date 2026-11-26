@@ -6,7 +6,7 @@ On-device tools for tidying a phone, in one React Native / Expo app (Android and
 |---|---|
 | **Duplicates** | Finds photos and videos that are ≥ 80% similar (adjustable), keeps the best copy of each group and pre-selects the rest for Trash. |
 | **Compress video** (Android) | Re-encodes videos with HandBrake's settings (default preset, 720p HD, RF 26) using x264, in the background with a progress notification. |
-| **System cleaner** (Android) | Finds and deletes files nothing uses any more: leftovers of removed apps, expired Trash, unfinished saves and downloads, empty files and folders. Anything over 50 MB is listed to check first. |
+| **System cleaner** (Android) | Finds and deletes files nothing uses any more: leftovers of removed apps, expired Trash, unfinished saves and downloads, leftover APK installers, computer leftovers, logs, backup copies, empty files and folders. Anything over 50 MB is listed to check first. |
 | **Folder names** | Renames each child folder of a picked folder from its photo and video count, e.g. `1V20P` or `JAMES_22V21P`. |
 | **File names** | Groups files with look-alike names so each group can be renamed in one go: `Name_00001.jpg`, `Name_00002.mp4`, … |
 | **Archives** (Android) | Creates ZIPs from files and folders, with an AES-256 password and/or split into parts; extracts ZIP (incl. split and password), RAR 4/5 (incl. password and multi-part) and 7Z. |
@@ -51,7 +51,7 @@ On launch the app checks its two permissions and, if one is missing, shows what 
 | Photos and videos (`READ_MEDIA_IMAGES` / `READ_MEDIA_VIDEO`) | Duplicates, Compress video | system prompt |
 | Notifications (`POST_NOTIFICATIONS`) | Compress video (progress while in the background) | system prompt when compressing starts; optional |
 | All files access (`MANAGE_EXTERNAL_STORAGE`) | System cleaner, Folder names, File names, Archives | toggle in Settings (the app opens the page) |
-| See all apps (`QUERY_ALL_PACKAGES`) | System cleaner (leftovers of removed apps) | granted on install |
+| See all apps (`QUERY_ALL_PACKAGES`) | System cleaner (leftovers of removed apps, whether an APK's app is installed) | granted on install |
 
 Each tool also checks again before it needs the permission. *All files access* and *See all apps* are fine for sideloading; Google Play only allows them for apps whose core purpose needs them.
 
@@ -152,13 +152,17 @@ Choose what to look for and tap **Scan**. Every folder on internal storage and S
 | Leftovers of removed apps | `Android/media/<package>` folders of apps that are no longer installed (apps removed with "keep data" count as installed) |
 | Expired Trash | `.trashed-<expiry>-name` files whose 30 days in Trash ran out but that the system never removed |
 | Unfinished saves | `.pending-<expiry>-name` files an app never finished, past their expiry |
-| Temporary files | `.tmp`, `.temp`, `.crdownload`, `.part`, `.partial`, untouched for 24 hours |
+| Temporary files | `.tmp`, `.temp`, `.crdownload`, `.part`, `.partial`, and unfinished torrents (`.!qB`, `.!ut`, `.bc!`, `.aria2`), untouched for 24 hours |
+| Installer files (APKs) | `.apk`, `.apks`, `.xapk`, `.apkm` files untouched for 10 minutes. Each row shows the app and version inside and whether it's **Installed** (same or newer version), **Newer than installed**, **Not installed**, or **Can't check** (split bundles, damaged files). Only **Installed** ones are selected for you, and APKs are never locked under the 50 MB check |
+| Computer leftovers | `Thumbs.db`, `desktop.ini`, `.DS_Store` and macOS `._name` files, untouched for 24 hours, and `__MACOSX` folders that hold nothing but those |
+| Logs and crash files | `.log`, `.dmp`, `.trace`, and `bugreport-….zip` in `Download`, untouched for 24 hours |
+| Backup copies | `name~`, `.bak`, `.old` and vim's `.swp` files, untouched for 24 hours |
 | Empty files | 0-byte files untouched for 24 hours; hidden ones such as `.nomedia` are kept |
 | Empty folders | folders with no file at any depth, untouched for 24 hours; only the topmost is listed. Hidden folders and the standard ones (`DCIM`, `Download`, `Pictures`, `DCIM/Camera` …) are kept |
 
 - **Over 50 MB:** such items are never selected for you. They are listed first under **Check before cleaning**, locked, and can be selected only after you open them: a folder shows its biggest files, a file opens in another app.
 - **Deleted for good:** cleaned items don't go to Trash. Each one is checked again just before it is deleted, so anything that changed since the scan (a folder that got a file, an app that was reinstalled) is left alone.
-- Inside `Android/` only the leftovers above are touched; inside hidden folders only expired Trash and unfinished saves. `Android/data` and `Android/obb` can't be read by any app since Android 11.
+- Inside `Android/` only the leftovers above are touched; inside hidden folders only expired Trash and unfinished saves. Hidden files are kept, except `.DS_Store`, `._name` and `.swp`. `Android/data` and `Android/obb` can't be read by any app since Android 11.
 
 ## Folder names
 
